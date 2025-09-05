@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,85 +15,106 @@
             --dark-bg: rgb(17, 17, 17);
             --card-bg: rgb(30, 30, 30);
         }
-        
+
         body {
             background-color: var(--dark-bg);
             color: white;
             font-family: 'Inter', sans-serif;
         }
-        
-        .bg-primary-green { background-color: var(--primary-green); }
-        .bg-light-green { background-color: var(--light-green); }
-        .bg-card { background-color: var(--card-bg); }
-        .text-primary-green { color: var(--primary-green); }
-        .border-primary-green { border-color: var(--primary-green); }
-        
+
+        .bg-primary-green {
+            background-color: var(--primary-green);
+        }
+
+        .bg-light-green {
+            background-color: var(--light-green);
+        }
+
+        .bg-card {
+            background-color: var(--card-bg);
+        }
+
+        .text-primary-green {
+            color: var(--primary-green);
+        }
+
+        .border-primary-green {
+            border-color: var(--primary-green);
+        }
+
         .gradient-bg {
             background: linear-gradient(135deg, var(--dark-bg) 0%, var(--card-bg) 100%);
         }
-        
+
         .hover-scale {
             transition: transform 0.3s ease;
         }
-        
+
         .hover-scale:hover {
             transform: scale(1.05);
         }
-        
+
         .chart-container {
             position: relative;
             height: 250px;
             width: 100%;
         }
-        
+
         .small-chart {
             height: 200px;
         }
-        
+
         .section {
             min-height: 100vh;
             padding: 2rem 0;
         }
-        
+
         @media (max-width: 768px) {
             .chart-container {
                 height: 200px;
             }
+
             .section {
                 min-height: auto;
                 padding: 1rem 0;
             }
         }
-        
+
         .nav-active {
             background-color: var(--primary-green);
             color: white;
         }
-        
+
         .market-ticker {
             background: linear-gradient(90deg, transparent 0%, var(--primary-green) 50%, transparent 100%);
             animation: ticker 30s linear infinite;
         }
-        
+
         @keyframes ticker {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
+            0% {
+                transform: translateX(100%);
+            }
+
+            100% {
+                transform: translateX(-100%);
+            }
         }
-        
+
         .proposal-card {
             transition: all 0.3s ease;
         }
-        
+
         .proposal-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(40, 77, 28, 0.3);
         }
-        
+
         .progress-bar {
             background: linear-gradient(90deg, var(--primary-green) 0%, var(--light-green) 100%);
         }
     </style>
 </head>
+
 <body>
     <!-- Navigation -->
     <nav class="fixed top-0 w-full bg-card z-50 shadow-lg">
@@ -105,11 +127,16 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <button onclick="showSection('homepage')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-green transition-colors">Home</button>
-                    <button onclick="showSection('dashboard')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-green transition-colors">Dashboard</button>
-                    <button onclick="showSection('club')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-green transition-colors">Club</button>
-                    <button onclick="showSection('proposals')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-green transition-colors">Proposals</button>
-                    <button onclick="showSection('reports')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-green transition-colors">Reports</button>
+                    <button onclick="showSection('homepage')"
+                        class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-green transition-colors">Home</button>
+                    <button onclick="showSection('dashboard')"
+                        class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-green transition-colors">Dashboard</button>
+                    <button onclick="showSection('club')"
+                        class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-green transition-colors">Club</button>
+                    <button onclick="showSection('proposals')"
+                        class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-green transition-colors">Proposals</button>
+                    <button onclick="showSection('reports')"
+                        class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-green transition-colors">Reports</button>
                 </div>
             </div>
         </div>
@@ -126,14 +153,16 @@
                         <span class="text-white">Grow Together</span>
                     </h1>
                     <p class="text-xl mb-8 text-gray-300 max-w-3xl mx-auto">
-                        Join forces with friends and family to build wealth through collaborative investing. 
+                        Join forces with friends and family to build wealth through collaborative investing.
                         Pool funds, vote on investments, and track your collective portfolio growth.
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                        <button class="bg-primary-green hover:bg-light-green px-8 py-4 rounded-lg font-semibold text-lg transition-colors">
+                        <button
+                            class="bg-primary-green hover:bg-light-green px-8 py-4 rounded-lg font-semibold text-lg transition-colors">
                             <i class="fas fa-users mr-2"></i>Create a Club
                         </button>
-                        <button class="border-2 border-primary-green text-primary-green hover:bg-primary-green hover:text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors">
+                        <button
+                            class="border-2 border-primary-green text-primary-green hover:bg-primary-green hover:text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors">
                             <i class="fas fa-sign-in-alt mr-2"></i>Join Now
                         </button>
                     </div>
@@ -150,21 +179,24 @@
                         <i class="fas fa-users text-2xl"></i>
                     </div>
                     <h3 class="text-xl font-semibold mb-3">1. Create & Invite</h3>
-                    <p class="text-gray-300">Start your investment club and invite trusted members to join your financial journey.</p>
+                    <p class="text-gray-300">Start your investment club and invite trusted members to join your
+                        financial journey.</p>
                 </div>
                 <div class="text-center">
                     <div class="bg-primary-green w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                         <i class="fas fa-piggy-bank text-2xl"></i>
                     </div>
                     <h3 class="text-xl font-semibold mb-3">2. Pool Funds</h3>
-                    <p class="text-gray-300">Members contribute to a shared investment fund with complete transparency and security.</p>
+                    <p class="text-gray-300">Members contribute to a shared investment fund with complete transparency
+                        and security.</p>
                 </div>
                 <div class="text-center">
                     <div class="bg-primary-green w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                         <i class="fas fa-vote-yea text-2xl"></i>
                     </div>
                     <h3 class="text-xl font-semibold mb-3">3. Vote & Invest</h3>
-                    <p class="text-gray-300">Propose investments, vote democratically, and track your collective portfolio performance.</p>
+                    <p class="text-gray-300">Propose investments, vote democratically, and track your collective
+                        portfolio performance.</p>
                 </div>
             </div>
         </div>
@@ -223,7 +255,9 @@
                             <p class="text-gray-400 text-sm">8 Members</p>
                         </div>
                     </div>
-                    <p class="text-gray-300 mb-4">"We grew our club fund by 25% in just 6 months by focusing on tech stocks and crypto investments. The voting system helped us make informed decisions together."</p>
+                    <p class="text-gray-300 mb-4">"We grew our club fund by 25% in just 6 months by focusing on tech
+                        stocks and crypto investments. The voting system helped us make informed decisions together."
+                    </p>
                     <div class="text-primary-green font-semibold">+25% Returns</div>
                 </div>
                 <div class="bg-card p-6 rounded-lg">
@@ -236,7 +270,8 @@
                             <p class="text-gray-400 text-sm">5 Members</p>
                         </div>
                     </div>
-                    <p class="text-gray-300 mb-4">"Perfect platform for our family to invest together. The transparency and reporting features give everyone confidence in our collective decisions."</p>
+                    <p class="text-gray-300 mb-4">"Perfect platform for our family to invest together. The transparency
+                        and reporting features give everyone confidence in our collective decisions."</p>
                     <div class="text-primary-green font-semibold">+18% Returns</div>
                 </div>
             </div>
@@ -300,13 +335,16 @@
                                 <h3 class="font-semibold">Invest in Tesla (TSLA)</h3>
                                 <span class="text-sm text-gray-400">2 days left</span>
                             </div>
-                            <p class="text-gray-300 text-sm mb-3">Proposal to allocate ₹50,000 to Tesla stock given recent price dip and strong fundamentals.</p>
+                            <p class="text-gray-300 text-sm mb-3">Proposal to allocate ₹50,000 to Tesla stock given
+                                recent price dip and strong fundamentals.</p>
                             <div class="flex items-center justify-between">
                                 <div class="flex space-x-2">
-                                    <button class="bg-primary-green px-3 py-1 rounded text-sm hover:bg-light-green transition-colors">
+                                    <button
+                                        class="bg-primary-green px-3 py-1 rounded text-sm hover:bg-light-green transition-colors">
                                         <i class="fas fa-thumbs-up mr-1"></i>Yes (5)
                                     </button>
-                                    <button class="bg-red-600 px-3 py-1 rounded text-sm hover:bg-red-700 transition-colors">
+                                    <button
+                                        class="bg-red-600 px-3 py-1 rounded text-sm hover:bg-red-700 transition-colors">
                                         <i class="fas fa-thumbs-down mr-1"></i>No (1)
                                     </button>
                                 </div>
@@ -322,13 +360,16 @@
                                 <h3 class="font-semibold">Bitcoin Investment</h3>
                                 <span class="text-sm text-gray-400">5 days left</span>
                             </div>
-                            <p class="text-gray-300 text-sm mb-3">Diversify portfolio with ₹30,000 Bitcoin investment for crypto exposure.</p>
+                            <p class="text-gray-300 text-sm mb-3">Diversify portfolio with ₹30,000 Bitcoin investment
+                                for crypto exposure.</p>
                             <div class="flex items-center justify-between">
                                 <div class="flex space-x-2">
-                                    <button class="bg-primary-green px-3 py-1 rounded text-sm hover:bg-light-green transition-colors">
+                                    <button
+                                        class="bg-primary-green px-3 py-1 rounded text-sm hover:bg-light-green transition-colors">
                                         <i class="fas fa-thumbs-up mr-1"></i>Yes (3)
                                     </button>
-                                    <button class="bg-red-600 px-3 py-1 rounded text-sm hover:bg-red-700 transition-colors">
+                                    <button
+                                        class="bg-red-600 px-3 py-1 rounded text-sm hover:bg-red-700 transition-colors">
                                         <i class="fas fa-thumbs-down mr-1"></i>No (2)
                                     </button>
                                 </div>
@@ -347,39 +388,47 @@
                     <div class="bg-dark-bg rounded-lg p-4 h-64 overflow-y-auto mb-4">
                         <div class="space-y-3">
                             <div class="flex items-start space-x-3">
-                                <div class="bg-primary-green w-8 h-8 rounded-full flex items-center justify-center text-sm">A</div>
+                                <div
+                                    class="bg-primary-green w-8 h-8 rounded-full flex items-center justify-center text-sm">
+                                    A</div>
                                 <div class="flex-1">
                                     <div class="flex items-center space-x-2">
                                         <span class="font-semibold text-sm">Amit</span>
                                         <span class="text-gray-400 text-xs">2:30 PM</span>
                                     </div>
-                                    <p class="text-sm text-gray-300">Tesla looks promising after the recent dip. Good time to buy?</p>
+                                    <p class="text-sm text-gray-300">Tesla looks promising after the recent dip. Good
+                                        time to buy?</p>
                                 </div>
                             </div>
                             <div class="flex items-start space-x-3">
-                                <div class="bg-blue-600 w-8 h-8 rounded-full flex items-center justify-center text-sm">P</div>
+                                <div class="bg-blue-600 w-8 h-8 rounded-full flex items-center justify-center text-sm">P
+                                </div>
                                 <div class="flex-1">
                                     <div class="flex items-center space-x-2">
                                         <span class="font-semibold text-sm">Priya</span>
                                         <span class="text-gray-400 text-xs">2:35 PM</span>
                                     </div>
-                                    <p class="text-sm text-gray-300">I agree! Their Q3 results were strong despite the market volatility.</p>
+                                    <p class="text-sm text-gray-300">I agree! Their Q3 results were strong despite the
+                                        market volatility.</p>
                                 </div>
                             </div>
                             <div class="flex items-start space-x-3">
-                                <div class="bg-green-600 w-8 h-8 rounded-full flex items-center justify-center text-sm">R</div>
+                                <div class="bg-green-600 w-8 h-8 rounded-full flex items-center justify-center text-sm">
+                                    R</div>
                                 <div class="flex-1">
                                     <div class="flex items-center space-x-2">
                                         <span class="font-semibold text-sm">Raj</span>
                                         <span class="text-gray-400 text-xs">2:40 PM</span>
                                     </div>
-                                    <p class="text-sm text-gray-300">Let me check the technical analysis before voting.</p>
+                                    <p class="text-sm text-gray-300">Let me check the technical analysis before voting.
+                                    </p>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="flex space-x-2">
-                        <input type="text" placeholder="Type your message..." class="flex-1 bg-dark-bg border border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-green">
+                        <input type="text" placeholder="Type your message..."
+                            class="flex-1 bg-dark-bg border border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-green">
                         <button class="bg-primary-green px-4 py-2 rounded-lg hover:bg-light-green transition-colors">
                             <i class="fas fa-paper-plane"></i>
                         </button>
@@ -438,7 +487,8 @@
 
                         <div class="flex items-center justify-between p-4 bg-dark-bg rounded-lg">
                             <div class="flex items-center space-x-3">
-                                <div class="bg-green-600 w-10 h-10 rounded-full flex items-center justify-center">R</div>
+                                <div class="bg-green-600 w-10 h-10 rounded-full flex items-center justify-center">R
+                                </div>
                                 <div>
                                     <div class="font-semibold">Raj Patel</div>
                                     <div class="text-sm text-gray-400">Member</div>
@@ -452,7 +502,8 @@
 
                         <div class="flex items-center justify-between p-4 bg-dark-bg rounded-lg">
                             <div class="flex items-center space-x-3">
-                                <div class="bg-purple-600 w-10 h-10 rounded-full flex items-center justify-center">S</div>
+                                <div class="bg-purple-600 w-10 h-10 rounded-full flex items-center justify-center">S
+                                </div>
                                 <div>
                                     <div class="font-semibold">Sneha Reddy</div>
                                     <div class="text-sm text-gray-400">Member</div>
@@ -572,15 +623,20 @@
                         <form class="space-y-4">
                             <div>
                                 <label class="block text-sm font-medium mb-1">Investment Title</label>
-                                <input type="text" class="w-full bg-dark-bg border border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-green" placeholder="e.g., Apple Stock Investment">
+                                <input type="text"
+                                    class="w-full bg-dark-bg border border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-green"
+                                    placeholder="e.g., Apple Stock Investment">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium mb-1">Amount (₹)</label>
-                                <input type="number" class="w-full bg-dark-bg border border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-green" placeholder="50000">
+                                <input type="number"
+                                    class="w-full bg-dark-bg border border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-green"
+                                    placeholder="50000">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium mb-1">Investment Type</label>
-                                <select class="w-full bg-dark-bg border border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-green">
+                                <select
+                                    class="w-full bg-dark-bg border border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-green">
                                     <option>Stocks</option>
                                     <option>Crypto</option>
                                     <option>Mutual Funds</option>
@@ -589,13 +645,17 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium mb-1">Description</label>
-                                <textarea class="w-full bg-dark-bg border border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-green h-20" placeholder="Explain your investment rationale..."></textarea>
+                                <textarea
+                                    class="w-full bg-dark-bg border border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-green h-20"
+                                    placeholder="Explain your investment rationale..."></textarea>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium mb-1">Voting Deadline</label>
-                                <input type="date" class="w-full bg-dark-bg border border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-green">
+                                <input type="date"
+                                    class="w-full bg-dark-bg border border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-green">
                             </div>
-                            <button type="submit" class="w-full bg-primary-green hover:bg-light-green py-2 rounded-lg font-semibold transition-colors">
+                            <button type="submit"
+                                class="w-full bg-primary-green hover:bg-light-green py-2 rounded-lg font-semibold transition-colors">
                                 Submit Proposal
                             </button>
                         </form>
@@ -616,7 +676,9 @@
                                     </div>
                                     <span class="bg-primary-green px-2 py-1 rounded text-xs">Active</span>
                                 </div>
-                                <p class="text-gray-300 mb-4">Investment of ₹50,000 in Tesla (TSLA) following recent 15% price correction. Strong fundamentals and upcoming product launches make this an attractive entry point.</p>
+                                <p class="text-gray-300 mb-4">Investment of ₹50,000 in Tesla (TSLA) following recent 15%
+                                    price correction. Strong fundamentals and upcoming product launches make this an
+                                    attractive entry point.</p>
                                 <div class="grid grid-cols-3 gap-4 mb-4">
                                     <div class="text-center">
                                         <div class="text-lg font-bold text-primary-green">₹50,000</div>
@@ -632,10 +694,12 @@
                                     </div>
                                 </div>
                                 <div class="flex space-x-2">
-                                    <button class="flex-1 bg-primary-green hover:bg-light-green py-2 rounded font-semibold transition-colors">
+                                    <button
+                                        class="flex-1 bg-primary-green hover:bg-light-green py-2 rounded font-semibold transition-colors">
                                         <i class="fas fa-thumbs-up mr-1"></i>Vote Yes
                                     </button>
-                                    <button class="flex-1 bg-red-600 hover:bg-red-700 py-2 rounded font-semibold transition-colors">
+                                    <button
+                                        class="flex-1 bg-red-600 hover:bg-red-700 py-2 rounded font-semibold transition-colors">
                                         <i class="fas fa-thumbs-down mr-1"></i>Vote No
                                     </button>
                                 </div>
@@ -653,7 +717,9 @@
                                     </div>
                                     <span class="bg-blue-500 px-2 py-1 rounded text-xs">Active</span>
                                 </div>
-                                <p class="text-gray-300 mb-4">Allocate ₹30,000 to Bitcoin for cryptocurrency exposure. Current market conditions and institutional adoption suggest good timing for entry.</p>
+                                <p class="text-gray-300 mb-4">Allocate ₹30,000 to Bitcoin for cryptocurrency exposure.
+                                    Current market conditions and institutional adoption suggest good timing for entry.
+                                </p>
                                 <div class="grid grid-cols-3 gap-4 mb-4">
                                     <div class="text-center">
                                         <div class="text-lg font-bold text-primary-green">₹30,000</div>
@@ -669,10 +735,12 @@
                                     </div>
                                 </div>
                                 <div class="flex space-x-2">
-                                    <button class="flex-1 bg-primary-green hover:bg-light-green py-2 rounded font-semibold transition-colors">
+                                    <button
+                                        class="flex-1 bg-primary-green hover:bg-light-green py-2 rounded font-semibold transition-colors">
                                         <i class="fas fa-thumbs-up mr-1"></i>Vote Yes
                                     </button>
-                                    <button class="flex-1 bg-red-600 hover:bg-red-700 py-2 rounded font-semibold transition-colors">
+                                    <button
+                                        class="flex-1 bg-red-600 hover:bg-red-700 py-2 rounded font-semibold transition-colors">
                                         <i class="fas fa-thumbs-down mr-1"></i>Vote No
                                     </button>
                                 </div>
@@ -804,35 +872,40 @@
                                 <tr>
                                     <td class="py-3">Oct 15, 2024</td>
                                     <td class="py-3">Microsoft (MSFT)</td>
-                                    <td class="py-3"><span class="bg-green-600 px-2 py-1 rounded text-xs">Buy</span></td>
+                                    <td class="py-3"><span class="bg-green-600 px-2 py-1 rounded text-xs">Buy</span>
+                                    </td>
                                     <td class="py-3 text-right">₹45,000</td>
                                     <td class="py-3 text-right text-green-400">+₹5,625</td>
                                 </tr>
                                 <tr>
                                     <td class="py-3">Sep 28, 2024</td>
                                     <td class="py-3">HDFC Bank</td>
-                                    <td class="py-3"><span class="bg-green-600 px-2 py-1 rounded text-xs">Buy</span></td>
+                                    <td class="py-3"><span class="bg-green-600 px-2 py-1 rounded text-xs">Buy</span>
+                                    </td>
                                     <td class="py-3 text-right">₹35,000</td>
                                     <td class="py-3 text-right text-green-400">+₹2,870</td>
                                 </tr>
                                 <tr>
                                     <td class="py-3">Sep 15, 2024</td>
                                     <td class="py-3">Infosys (INFY)</td>
-                                    <td class="py-3"><span class="bg-green-600 px-2 py-1 rounded text-xs">Buy</span></td>
+                                    <td class="py-3"><span class="bg-green-600 px-2 py-1 rounded text-xs">Buy</span>
+                                    </td>
                                     <td class="py-3 text-right">₹40,000</td>
                                     <td class="py-3 text-right text-green-400">+₹3,200</td>
                                 </tr>
                                 <tr>
                                     <td class="py-3">Aug 30, 2024</td>
                                     <td class="py-3">TCS</td>
-                                    <td class="py-3"><span class="bg-green-600 px-2 py-1 rounded text-xs">Buy</span></td>
+                                    <td class="py-3"><span class="bg-green-600 px-2 py-1 rounded text-xs">Buy</span>
+                                    </td>
                                     <td class="py-3 text-right">₹50,000</td>
                                     <td class="py-3 text-right text-green-400">+₹6,500</td>
                                 </tr>
                                 <tr>
                                     <td class="py-3">Aug 15, 2024</td>
                                     <td class="py-3">Reliance Industries</td>
-                                    <td class="py-3"><span class="bg-green-600 px-2 py-1 rounded text-xs">Buy</span></td>
+                                    <td class="py-3"><span class="bg-green-600 px-2 py-1 rounded text-xs">Buy</span>
+                                    </td>
                                     <td class="py-3 text-right">₹35,000</td>
                                     <td class="py-3 text-right text-red-400">-₹1,750</td>
                                 </tr>
@@ -853,7 +926,8 @@
                         <i class="fas fa-chart-line text-primary-green text-2xl mr-2"></i>
                         <span class="text-xl font-bold">InvestTogether</span>
                     </div>
-                    <p class="text-gray-400 text-sm">Empowering collaborative investing for better financial futures.</p>
+                    <p class="text-gray-400 text-sm">Empowering collaborative investing for better financial futures.
+                    </p>
                 </div>
                 <div>
                     <h3 class="font-semibold mb-3">Platform</h3>
@@ -884,7 +958,7 @@
                 </div>
             </div>
             <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400 text-sm">
-                <p>&copy; 2024 InvestTogether. All rights reserved. | Designed for collaborative wealth building.</p>
+                <p>&copy; 2025 InvestTogether. All rights reserved. | Designed for collaborative wealth building.</p>
             </div>
         </div>
     </footer>
@@ -897,16 +971,16 @@
             sections.forEach(id => {
                 document.getElementById(id).classList.add('hidden');
             });
-            
+
             // Show selected section
             document.getElementById(sectionId).classList.remove('hidden');
-            
+
             // Update navigation active state
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('nav-active');
             });
             event.target.classList.add('nav-active');
-            
+
             // Initialize charts when sections are shown
             if (sectionId === 'dashboard') {
                 setTimeout(initializeDashboardCharts, 100);
@@ -942,11 +1016,11 @@
                             }
                         },
                         scales: {
-                            x: { 
+                            x: {
                                 ticks: { color: 'white' },
                                 grid: { color: 'rgba(255, 255, 255, 0.1)' }
                             },
-                            y: { 
+                            y: {
                                 ticks: { color: 'white' },
                                 grid: { color: 'rgba(255, 255, 255, 0.1)' }
                             }
@@ -980,7 +1054,7 @@
                         plugins: {
                             legend: {
                                 position: 'bottom',
-                                labels: { 
+                                labels: {
                                     color: 'white',
                                     padding: 15,
                                     font: { size: 10 }
@@ -1033,11 +1107,11 @@
                             }
                         },
                         scales: {
-                            x: { 
+                            x: {
                                 ticks: { color: 'white' },
                                 grid: { color: 'rgba(255, 255, 255, 0.1)' }
                             },
-                            y: { 
+                            y: {
                                 ticks: { color: 'white' },
                                 grid: { color: 'rgba(255, 255, 255, 0.1)' }
                             }
@@ -1070,7 +1144,7 @@
                         plugins: {
                             legend: {
                                 position: 'right',
-                                labels: { 
+                                labels: {
                                     color: 'white',
                                     padding: 20
                                 }
@@ -1082,10 +1156,10 @@
         }
 
         // Initialize the page
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Show homepage by default
             showSection('homepage');
-            
+
             // Set default active navigation
             document.querySelector('[onclick="showSection(\'homepage\')"]').classList.add('nav-active');
         });
@@ -1105,13 +1179,13 @@
         });
 
         // Add some interactive features
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             // Handle proposal voting
             if (e.target.matches('.vote-yes, .vote-no')) {
                 e.preventDefault();
                 alert('Vote recorded! (Demo functionality)');
             }
-            
+
             // Handle form submissions
             if (e.target.matches('button[type="submit"]')) {
                 e.preventDefault();
@@ -1120,4 +1194,5 @@
         });
     </script>
 </body>
+
 </html>

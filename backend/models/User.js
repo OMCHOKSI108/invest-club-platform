@@ -16,19 +16,18 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-        trim: true
-    },
-    number: {
-        type: String,
-        required: true,
-        trim: true
+        index: true
     },
     email: {
         type: String,
         required: true,
         unique: true,
         lowercase: true,
-        trim: true
+        index: true
+    },
+    phone: {
+        type: String,
+        index: true
     },
     password: {
         type: String,
@@ -38,6 +37,20 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    kycStatus: {
+        type: String,
+        enum: ["none", "pending", "verified", "rejected"],
+        default: "none"
+    },
+    roles: {
+        type: [String],
+        default: ["user"]
+    },
+    meta: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {}
+    },
+    // Legacy OTP fields (can be removed later)
     otp: {
         type: String
     },

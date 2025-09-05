@@ -49,7 +49,7 @@ router.post('/signup', [
         });
 
         await user.save();
-        await sendOTP(email, otp);
+        await sendOTP(email, otp, firstName);
 
         res.status(201).json({ message: 'OTP sent to email' });
     } catch (error) {
@@ -151,7 +151,7 @@ router.post('/forgot-password', [
         await user.save();
 
         // Send temporary password via email
-        await sendTempPassword(email, tempPassword);
+        await sendTempPassword(email, tempPassword, user.firstName);
 
         res.json({ message: 'Temporary password sent to your email' });
     } catch (error) {
@@ -172,7 +172,7 @@ router.post('/test-email', async (req, res) => {
     try {
         const otp = generateOTP();
         // sendOTP will either send or log depending on transporter state
-        await sendOTP(email, otp);
+        await sendOTP(email, otp, 'Test User');
         return res.json({ message: 'Test OTP processed', email, otp: process.env.NODE_ENV === 'production' ? undefined : otp });
     } catch (err) {
         console.error('Test-email error:', err);

@@ -1,0 +1,555 @@
+Nice — got you, Captain. Below I give **only Mongoose** schemas (Node/TypeScript-ready) for every backend entity you’ll need, plus concise **business logic rules** and a complete mapping of **endpoints → models** so your developer can implement routes/controllers fast.
+
+I kept the schemas compact but production-ready (indexes, types, timestamps, and helpful comments). After the schemas you’ll find the **core logic rules** (voting, contributions, execution, idempotency) and a full **endpoints list** grouped by resource with the HTTP method and a short note about what model(s) it touches.
+
+You can copy/paste these into your Node project (Mongoose + TypeScript). If you want, I can also generate controller skeletons next.
+
+---
+
+# User model (Mongoose)
+
+```ts
+import { Schema, model, Types } from "mongoose";
+
+const UserSchema = new Schema({
+  firstName: { type: String, required: true, trim: true },
+  lastName: { type: String, required: true, trim: true },
+  username: { type: String, required: true, unique: true, index: true },
+  email: { type: String, required: true, unique: true, lowercase: true, index: true },
+  phone: { type: String, index: true },
+  passwordHash: { type: String, required: true },
+  isVerified: { type: Boolean, default: false }, // email verified
+  kycStatus: { type: String, enum: ["none","pending","verified","rejected"], default: "none" },
+  roles: { type: [String], default: ["user"] }, // system-level roles
+  meta: { type: Schema.Types.Mixed, default: {} },
+}, { timestamps: true });
+
+UserSchema.index({ email: 1 });
+UserSchema.index({ username: 1 });
+
+export const User = model("User", UserSchema);
+```
+
+---
+
+# RefreshToken / Session
+
+```ts
+const RefreshTokenSchema = new Schema({
+  userId: { type: Types.ObjectId, ref: "User", required: true, index: true },
+  token: { type: String, required: true, unique: true },
+  deviceInfo: { type: Schema.Types.Mixed },
+  expiresAt: { type: Date, required: true },
+  revoked: { type: Boolean, default: false }
+}, { timestamps: true });
+
+export const RefreshToken = model("RefreshToken", RefreshTokenSchema);
+```
+
+---
+
+# Club
+
+```ts
+const ClubSchema = new Schema({
+  name: { type: String, required: true, index: true },
+  description: { type: String, default: "" },
+  ownerId: { type: Types.ObjectId, ref: "User", required: true, index: true },
+  minContribution: { type: Number, default: 0 }, // store in smallest currency unit
+  currency: { type: String, default: "INR" },
+  votingMode: { type: String, enum: ["simple","weighted"], default: "simple" },
+  approvalThresholdPercent: { type: Number, default: 50 },
+  votingPeriodDays: { type: Number, default: 7 },
+  isPublic: { type: Boolean, default: false },
+  settings: { type: Schema.Types.Mixed, default: {} },
+}, { timestamps: true });
+
+ClubSchema.index({ ownerId: 1 });
+
+export const Club = model("Club", ClubSchema);
+```
+
+---
+
+# ClubMember (one doc per member per club)
+
+```ts
+const ClubMemberSchema = new Schema({
+  clubId: { type: Types.ObjectId, ref: "Club", required: true, index: true },
+  userId: { type: Types.ObjectId, ref: "User", required: true, index: true },
+  role: { type: String, enum: ["owner","admin","treasurer","member"], default: "member" },
+  contributionAmount: { type: Number, default: 0 }, // sum of succeeded contributions for this member
+  joinDate: { type: Date, default: Date.now },
+  // cached snapshot of share percent at a defined freeze time (see logic)
+  sharePercentSnapshot: { type: Number, default: 0 },
+  metadata: { type: Schema.Types.Mixed, default: {} }
+}, { timestamps: true });
+
+ClubMemberSchema.index({ clubId: 1, userId: 1 }, { unique: true });
+ClubMemberSchema.index({ userId: 1 });
+
+export const ClubMember = model("ClubMember", ClubMemberSchema);
+```
+
+---
+
+# Contribution
+
+```ts
+const ContributionSchema = new Schema({
+  clubId: { type: Types.ObjectId, ref: "Club", required: true, index: true },
+  userId: { type: Types.ObjectId, ref: "User", required: true, index: true },
+  amount: { type: Number, required: true },
+  currency: { type: String, default: "INR" },
+  status: { type: String, enum: ["pending","succeeded","failed","cancelled"], default: "pending" },
+  provider: { type: String }, // RAZORPAY, STRIPE, MANUAL
+  providerPaymentId: { type: String, index: true }, // id from provider for idempotency
+  receiptUrl: { type: String },
+  note: { type: String },
+  approvedBy: { type: Types.ObjectId, ref: "User" } // used for manual contributions
+}, { timestamps: true });
+
+ContributionSchema.index({ providerPaymentId: 1 });
+ContributionSchema.index({ clubId: 1, userId: 1 });
+
+export const Contribution = model("Contribution", ContributionSchema);
+```
+
+---
+
+# Transaction (ledger entry)
+
+```ts
+const TransactionSchema = new Schema({
+  clubId: { type: Types.ObjectId, ref: "Club", required: true, index: true },
+  type: { type: String, enum: ["contribution","buy","sell","payout","fee","adjustment"], required: true },
+  amount: { type: Number, required: true },
+  currency: { type: String, default: "INR" },
+  relatedModel: { type: String }, // e.g., "Contribution","Order"
+  relatedId: { type: Types.ObjectId }, // reference to specific model doc
+  meta: { type: Schema.Types.Mixed, default: {} },
+  createdBy: { type: Types.ObjectId, ref: "User" }
+}, { timestamps: true });
+
+TransactionSchema.index({ clubId: 1, createdAt: -1 });
+
+export const Transaction = model("Transaction", TransactionSchema);
+```
+
+---
+
+# Proposal
+
+```ts
+const ProposalSchema = new Schema({
+  clubId: { type: Types.ObjectId, ref: "Club", required: true, index: true },
+  title: { type: String, required: true },
+  description: { type: String, default: "" },
+  amount: { type: Number, required: true },
+  assetType: { type: String, enum: ["stock","mf","crypto","bond","other"], default: "stock" },
+  assetSymbol: { type: String },
+  createdBy: { type: Types.ObjectId, ref: "User", required: true },
+  deadline: { type: Date, required: true, index: true },
+  executionMethod: { type: String, enum: ["manual","auto"], default: "manual" },
+  status: { type: String, enum: ["active","approved","rejected","executed","cancelled"], default: "active", index: true },
+  // vote aggregates for quick evaluation (used in weighted mode)
+  votesCount: { type: Number, default: 0 },
+  yesWeight: { type: Number, default: 0 },
+  noWeight: { type: Number, default: 0 },
+  // snapshot of total eligible weight at creation (important)
+  weightSnapshotTotal: { type: Number, default: 0 },
+  resolvedAt: { type: Date },
+}, { timestamps: true });
+
+ProposalSchema.index({ clubId: 1, status: 1, createdAt: -1 });
+
+export const Proposal = model("Proposal", ProposalSchema);
+```
+
+---
+
+# Vote
+
+```ts
+const VoteSchema = new Schema({
+  proposalId: { type: Types.ObjectId, ref: "Proposal", required: true, index: true },
+  userId: { type: Types.ObjectId, ref: "User", required: true, index: true },
+  vote: { type: String, enum: ["yes","no"], required: true },
+  weight: { type: Number, default: 1 }, // computed at cast time or snapshot weight
+  comment: { type: String },
+}, { timestamps: true });
+
+VoteSchema.index({ proposalId: 1, userId: 1 }, { unique: true });
+
+export const Vote = model("Vote", VoteSchema);
+```
+
+---
+
+# Position (portfolio holding)
+
+```ts
+const PositionSchema = new Schema({
+  clubId: { type: Types.ObjectId, ref: "Club", required: true, index: true },
+  symbol: { type: String, required: true, index: true },
+  quantity: { type: Number, required: true },
+  avgPrice: { type: Number, required: true },
+  lastPrice: { type: Number }, // updated by market worker
+  currency: { type: String, default: "INR" },
+  metadata: { type: Schema.Types.Mixed, default: {} }
+}, { timestamps: true });
+
+PositionSchema.index({ clubId: 1, symbol: 1 }, { unique: true });
+
+export const Position = model("Position", PositionSchema);
+```
+
+---
+
+# Order (broker/order tracking)
+
+```ts
+const OrderSchema = new Schema({
+  clubId: { type: Types.ObjectId, ref: "Club", required: true, index: true },
+  createdBy: { type: Types.ObjectId, ref: "User", required: true },
+  type: { type: String, enum: ["buy","sell"], required: true },
+  symbol: { type: String, required: true },
+  quantity: { type: Number, required: true },
+  orderType: { type: String, enum: ["market","limit"], default: "market" },
+  limitPrice: { type: Number },
+  status: { type: String, enum: ["pending","placed","partial","filled","cancelled","failed"], default: "pending" },
+  brokerOrderId: { type: String, index: true },
+  filledQuantity: { type: Number, default: 0 },
+  meta: { type: Schema.Types.Mixed, default: {} }
+}, { timestamps: true });
+
+OrderSchema.index({ brokerOrderId: 1 });
+
+export const Order = model("Order", OrderSchema);
+```
+
+---
+
+# MarketSubscription
+
+```ts
+const MarketSubscriptionSchema = new Schema({
+  clubId: { type: Types.ObjectId, ref: "Club", required: true, index: true },
+  symbol: { type: String, required: true, index: true },
+  createdBy: { type: Types.ObjectId, ref: "User" },
+  lastFetchedAt: { type: Date }
+}, { timestamps: true });
+
+MarketSubscriptionSchema.index({ symbol: 1 });
+MarketSubscriptionSchema.index({ clubId: 1, symbol: 1 }, { unique: true });
+
+export const MarketSubscription = model("MarketSubscription", MarketSubscriptionSchema);
+```
+
+---
+
+# PriceAlert
+
+```ts
+const PriceAlertSchema = new Schema({
+  clubId: { type: Types.ObjectId, ref: "Club", required: true, index: true },
+  symbol: { type: String, required: true },
+  conditionType: { type: String, enum: ["gte","lte"], required: true },
+  price: { type: Number, required: true },
+  notifyChannels: { type: [String], default: ["chat","email"] },
+  enabled: { type: Boolean, default: true },
+  createdBy: { type: Types.ObjectId, ref: "User" }
+}, { timestamps: true });
+
+PriceAlertSchema.index({ symbol: 1, enabled: 1 });
+
+export const PriceAlert = model("PriceAlert", PriceAlertSchema);
+```
+
+---
+
+# AuditLog (append-only)
+
+```ts
+const AuditLogSchema = new Schema({
+  clubId: { type: Types.ObjectId, ref: "Club", index: true },
+  userId: { type: Types.ObjectId, ref: "User" },
+  eventType: { type: String }, // vote_cast, contribution_succeeded, role_changed, proposal_resolved, order_filled...
+  data: { type: Schema.Types.Mixed }, // event payload
+  immutable: { type: Boolean, default: true } // marker that it shouldn't be edited
+}, { timestamps: true });
+
+AuditLogSchema.index({ clubId: 1, createdAt: -1 });
+
+export const AuditLog = model("AuditLog", AuditLogSchema);
+```
+
+---
+
+# File (uploads / receipts / agreements)
+
+```ts
+const FileSchema = new Schema({
+  clubId: { type: Types.ObjectId, ref: "Club", index: true },
+  uploadedBy: { type: Types.ObjectId, ref: "User" },
+  filename: { type: String },
+  url: { type: String, required: true },
+  mimeType: { type: String },
+  size: { type: Number },
+  metadata: { type: Schema.Types.Mixed }
+}, { timestamps: true });
+
+FileSchema.index({ clubId: 1 });
+
+export const File = model("File", FileSchema);
+```
+
+---
+
+# KYC Document
+
+```ts
+const KycSchema = new Schema({
+  userId: { type: Types.ObjectId, ref: "User", required: true, index: true },
+  status: { type: String, enum: ["pending","verified","rejected"], default: "pending" },
+  documents: [{ filename: String, url: String, type: String }],
+  reviewedBy: { type: Types.ObjectId, ref: "User" },
+  reviewedAt: { type: Date },
+  notes: { type: String }
+}, { timestamps: true });
+
+KycSchema.index({ userId: 1 });
+
+export const Kyc = model("Kyc", KycSchema);
+```
+
+---
+
+# Notification
+
+```ts
+const NotificationSchema = new Schema({
+  userId: { type: Types.ObjectId, ref: "User", index: true },
+  clubId: { type: Types.ObjectId, ref: "Club", index: true },
+  type: { type: String }, // proposal_result, payment_succeeded...
+  title: { type: String },
+  body: { type: String },
+  data: { type: Schema.Types.Mixed },
+  read: { type: Boolean, default: false }
+}, { timestamps: true });
+
+NotificationSchema.index({ userId: 1, read: 1 });
+
+export const Notification = model("Notification", NotificationSchema);
+```
+
+---
+
+# ReportJob (async jobs)
+
+```ts
+const ReportJobSchema = new Schema({
+  clubId: { type: Types.ObjectId, ref: "Club" },
+  type: { type: String }, // summary_pdf, tax_csv
+  params: { type: Schema.Types.Mixed },
+  status: { type: String, enum: ["queued","running","done","failed"], default: "queued" },
+  resultUrl: { type: String },
+  error: { type: String }
+}, { timestamps: true });
+
+ReportJobSchema.index({ status: 1, createdAt: -1 });
+
+export const ReportJob = model("ReportJob", ReportJobSchema);
+```
+
+---
+
+# WebhookEvent (store raw webhook to dedupe)
+
+```ts
+const WebhookEventSchema = new Schema({
+  provider: { type: String }, // stripe, razorpay, brokerX
+  providerEventId: { type: String, index: true },
+  payload: { type: Schema.Types.Mixed },
+  processed: { type: Boolean, default: false },
+  processedAt: { type: Date }
+}, { timestamps: true });
+
+WebhookEventSchema.index({ provider: 1, providerEventId: 1 }, { unique: true });
+
+export const WebhookEvent = model("WebhookEvent", WebhookEventSchema);
+```
+
+---
+
+# End of schemas
+
+All models use `timestamps: true` (createdAt, updatedAt) and include indexes where useful. Types and enums are explicit so validation can be driven by models.
+
+---
+
+# Core business logic (concise, developer-ready)
+
+1. **Contribution lifecycle**
+
+   * `pending` -> on payment webhook verify signature and idempotency (use WebhookEvent). If success:
+
+     * Mark `Contribution.status = 'succeeded'`.
+     * Create `Transaction` `{ type: 'contribution', relatedId: contribution._id }`.
+     * Increment member `contributionAmount` in `ClubMember` (atomic operation).
+     * Recompute club available cash (if you store wallet) or rely on ledger.
+   * Manual contributions: Treasurers create Contribution with `provider = 'MANUAL'` and `status = 'pending'`. Admin approves via endpoint which marks `succeeded` and follows above steps.
+
+2. **Voting & weight snapshot**
+
+   * When creating a proposal, record `weightSnapshotTotal` = sum of all member weights at proposal creation time. Weight can be:
+
+     * For `simple` voting: each member weight = 1.
+     * For `weighted`: member weight = contributionAmount (or percentage). IMPORTANT — freeze weights at proposal creation (store share percent or weight snapshot per ClubMember).
+   * When a user votes:
+
+     * Use cached snapshot weight for the user as of proposal creation.
+     * Create `Vote` doc (unique per proposal+user).
+     * Update `Proposal.votesCount++` and increment `yesWeight` or `noWeight` by weight (atomic ops).
+     * Append `AuditLog`.
+   * Closing a proposal (cron job or manual):
+
+     * If `proposal.yesWeight / weightSnapshotTotal * 100 >= approvalThresholdPercent` => `approved`.
+     * Else => `rejected`.
+     * Set `status`, `resolvedAt`, write `AuditLog`, notify members.
+   * **Edge**: if members join after proposal creation, they don't affect existing proposals (because of snapshot).
+
+3. **Execution**
+
+   * After `approved`, create an `Order` with `status = 'pending'`.
+   * Admin/treasurer triggers `execute` endpoint:
+
+     * If broker auto-connected and `executionMethod==='auto'` => place order with broker, store `brokerOrderId`.
+     * Else mark as manual execution — treasurer will mark `filled` with details; on fill create `Transaction(type='buy')` and update `Position` (or create).
+   * On fills, reconcile `Position.quantity`, `avgPrice`, create transaction entries, write `AuditLog`.
+
+4. **Idempotency & webhook dedupe**
+
+   * For every incoming webhook (payment, broker), store the raw event in `WebhookEvent` with unique `providerEventId`. If duplicate arrives, ignore processing.
+   * For outgoing requests that may be re-tried, support `Idempotency-Key` header to avoid creating duplicate Contributions/Orders.
+
+5. **Market data / subscriptions**
+
+   * `MarketSubscription` stores symbols per club. A worker polls FastAPI or subscribes to a market feed. On price update:
+
+     * Update `Position.lastPrice` as needed.
+     * Evaluate `PriceAlert` entries and push `Notification` + socket events.
+   * Cache quotes in Redis, not DB.
+
+6. **Atomicity**
+
+   * When updating financial state (contribution success -> increment member contribution, add transaction), use DB sessions/transactions where possible (MongoDB transactions across docs in replica set).
+
+7. **Audit & immutability**
+
+   * All money-moving and role-changing ops must create an `AuditLog` entry (append-only).
+   * Avoid updating/deleting audit records.
+
+8. **Security**
+
+   * Enforce role checks at controller level (`owner/admin/treasurer/member`).
+   * Only treasurer/admin can approve manual contributions and execute orders.
+   * Only owner can delete club.
+
+---
+
+# Endpoints mapped to models (concise, grouped)
+
+> For each, I list `METHOD PATH` — main models touched — short note.
+
+## Auth & User
+
+* `POST /api/auth/signup` — `User`, create temp OTP (use separate collection if desired)
+* `POST /api/auth/verify-signup` — `User`, `RefreshToken`
+* `POST /api/auth/login` — `User`, `RefreshToken`
+* `POST /api/auth/refresh` — `RefreshToken`
+* `POST /api/auth/logout` — `RefreshToken`
+* `GET /api/user/profile` — `User`
+* `PUT /api/user/profile` — `User`
+* `PUT /api/user/change-password` — `User`
+* `POST /api/user/kyc` — `Kyc`
+* `GET /api/user/kyc/status` — `Kyc`
+
+## Clubs & Membership
+
+* `POST /api/clubs` — `Club`, create owner ClubMember
+* `GET /api/clubs` — `Club` (+ membership join info via `ClubMember`)
+* `GET /api/clubs/:clubId` — `Club`, `ClubMember` summary
+* `PUT /api/clubs/:clubId` — `Club`
+* `DELETE /api/clubs/:clubId` — `Club`, `ClubMember`, `Positions`, `Proposals` (soft-delete recommended)
+* `POST /api/clubs/:clubId/invite` — (store token in `Club` metadata or separate collection)
+* `POST /api/clubs/:clubId/join` — `ClubMember`
+* `GET /api/clubs/:clubId/members` — `ClubMember`
+* `PUT /api/clubs/:clubId/members/:userId` — `ClubMember` (role, contribution snapshot)
+* `DELETE /api/clubs/:clubId/members/:userId` — `ClubMember`
+
+## Contributions & Payments
+
+* `POST /api/clubs/:clubId/contributions` — `Contribution` (create pending)
+* `POST /api/payments/webhook` — `WebhookEvent`, `Contribution`, `Transaction`, `ClubMember`
+* `GET /api/clubs/:clubId/contributions` — `Contribution`
+* `POST /api/clubs/:clubId/contributions/manual` — `Contribution` (provider=MANUAL)
+* `PUT /api/clubs/:clubId/contributions/:id/approve` — `Contribution`, `Transaction`, `ClubMember`
+
+## Proposals & Voting
+
+* `POST /api/clubs/:clubId/proposals` — `Proposal` (store `weightSnapshotTotal` from `ClubMember` contributions)
+* `GET /api/clubs/:clubId/proposals` — `Proposal`
+* `GET /api/clubs/:clubId/proposals/:proposalId` — `Proposal`, `Vote`
+* `POST /api/clubs/:clubId/proposals/:proposalId/vote` — `Vote`, `Proposal`, `AuditLog`
+* `POST /api/clubs/:clubId/proposals/:proposalId/close` — `Proposal`, `AuditLog`
+* `POST /api/clubs/:clubId/proposals/:proposalId/execute` — `Order`, `Transaction`, `AuditLog`
+
+## Portfolio / Orders / Positions
+
+* `GET /api/clubs/:clubId/portfolio` — `Position`, `Transaction`
+* `GET /api/clubs/:clubId/positions` — `Position`
+* `POST /api/clubs/:clubId/orders` — `Order`
+* `GET /api/clubs/:clubId/orders` — `Order`
+* `POST /api/broker/webhook` — `WebhookEvent`, `Order`, `Transaction`, `Position`
+
+## Transactions & Audit
+
+* `GET /api/clubs/:clubId/transactions` — `Transaction`
+* `GET /api/clubs/:clubId/audit-logs` — `AuditLog`
+
+## Market / Subscriptions / Alerts
+
+* `POST /api/market/subscribe` — `MarketSubscription`
+* `POST /api/market/unsubscribe` — `MarketSubscription`
+* `GET /api/market/subscriptions` — `MarketSubscription`
+* `POST /api/market/price-webhook` — `WebhookEvent`, `PriceAlert`, `Notification`, `Position`
+
+## Files / Reports / Notifications
+
+* `POST /api/clubs/:clubId/files` — `File`
+* `GET /api/clubs/:clubId/files` — `File`
+* `POST /api/clubs/:clubId/reports/generate` — `ReportJob`
+* `GET /api/reports/jobs/:jobId` — `ReportJob`
+* `GET /api/notifications` — `Notification`
+* `POST /api/notifications/mark-read` — `Notification`
+
+## Admin
+
+* `GET /api/admin/users` — `User`
+* `GET /api/admin/clubs` — `Club`
+* `POST /api/admin/kyc/:userId/verify` — `Kyc`, `User`
+* `GET /api/health` — none or query each service
+
+---
+
+# Final developer notes (short)
+
+* Use Mongo transactions where multi-doc consistency is required (replica set required). Examples: marking contribution succeeded + updating ClubMember contribution + creating Transaction — wrap in a transaction.
+* For heavy queries (portfolio aggregations), use aggregation pipelines and indexes: index `Position` by `{ clubId, symbol }`, `Transaction` by `{ clubId, createdAt }`.
+* Snapshots: store weight snapshot per `Proposal` (total) and `ClubMember.sharePercentSnapshot` if needed so votes use frozen values.
+* Webhooks: write `WebhookEvent` first, then `processed` flag to dedupe.
+* Background workers: cron or queue for `close-proposals`, `market-polling`, `report generation`.
+* Tests: unit tests for vote calculation (ties, fractional weights), integration tests for payment webhook flow (idempotency).
+
+---
