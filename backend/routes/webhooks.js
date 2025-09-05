@@ -9,6 +9,10 @@ const AuditLog = require('../models/AuditLog');
 const router = express.Router();
 
 // Payment webhook (Razorpay/Stripe)
+// POST /api/webhooks/payments/webhook
+// Handles payment gateway webhooks for contribution processing
+// Processes payment success events and updates contribution status
+// Response: { status: 'processed' | 'already_processed' | 'contribution_not_found' }
 router.post('/payments/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
     try {
         const signature = req.headers['x-razorpay-signature'] || req.headers['stripe-signature'];
@@ -87,6 +91,10 @@ router.post('/payments/webhook', express.raw({ type: 'application/json' }), asyn
 });
 
 // Broker webhook (for order updates)
+// POST /api/webhooks/broker/webhook
+// Handles broker webhooks for order status updates
+// Processes order fills and updates positions/transactions
+// Response: { status: 'processed' | 'already_processed' | 'order_not_found' }
 router.post('/broker/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
     try {
         const body = JSON.parse(req.body);
@@ -175,6 +183,10 @@ router.post('/broker/webhook', express.raw({ type: 'application/json' }), async 
 });
 
 // Market data webhook
+// POST /api/webhooks/market/webhook
+// Handles market data webhooks for price updates
+// Updates position prices and triggers price alerts
+// Response: { status: 'processed' }
 router.post('/market/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
     try {
         const body = JSON.parse(req.body);
