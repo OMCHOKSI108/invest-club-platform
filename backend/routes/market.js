@@ -7,6 +7,10 @@ const ClubMember = require('../models/ClubMember');
 const router = express.Router();
 
 // Subscribe to market data
+// POST /api/market/subscribe
+// Creates a subscription for market data updates for a specific symbol
+// Body: { clubId, symbol }
+// Response: { message: 'Market subscription created successfully', subscription }
 router.post('/subscribe', authenticateToken, [
     require('express-validator').body('clubId').isMongoId().withMessage('Valid club ID required'),
     require('express-validator').body('symbol').notEmpty().withMessage('Symbol is required')
@@ -40,6 +44,10 @@ router.post('/subscribe', authenticateToken, [
 });
 
 // Unsubscribe from market data
+// POST /api/market/unsubscribe
+// Removes a market data subscription for a specific symbol
+// Body: { clubId, symbol }
+// Response: { message: 'Market subscription removed successfully' }
 router.post('/unsubscribe', authenticateToken, [
     require('express-validator').body('clubId').isMongoId().withMessage('Valid club ID required'),
     require('express-validator').body('symbol').notEmpty().withMessage('Symbol is required')
@@ -62,6 +70,9 @@ router.post('/unsubscribe', authenticateToken, [
 });
 
 // Get market subscriptions
+// GET /api/market/subscriptions
+// Retrieves all market data subscriptions created by the authenticated user
+// Response: Array of market subscriptions with club details
 router.get('/subscriptions', authenticateToken, async (req, res) => {
     try {
         const subscriptions = await MarketSubscription.find({ createdBy: req.user._id })
@@ -75,6 +86,10 @@ router.get('/subscriptions', authenticateToken, async (req, res) => {
 });
 
 // Create price alert
+// POST /api/market/price-alert
+// Creates a price alert for a specific symbol and condition
+// Body: { clubId, symbol, conditionType: 'gte'|'lte', price, notifyChannels }
+// Response: { message: 'Price alert created successfully', alert }
 router.post('/price-alert', authenticateToken, [
     require('express-validator').body('clubId').isMongoId().withMessage('Valid club ID required'),
     require('express-validator').body('symbol').notEmpty().withMessage('Symbol is required'),
@@ -113,6 +128,9 @@ router.post('/price-alert', authenticateToken, [
 });
 
 // Get price alerts
+// GET /api/market/price-alerts/:clubId
+// Retrieves all active price alerts for a club (members only)
+// Response: Array of price alerts
 router.get('/price-alerts/:clubId', authenticateToken, async (req, res) => {
     try {
         const membership = await ClubMember.findOne({ clubId: req.params.clubId, userId: req.user._id });
@@ -129,6 +147,10 @@ router.get('/price-alerts/:clubId', authenticateToken, async (req, res) => {
 });
 
 // Update price alert
+// PUT /api/market/price-alert/:alertId
+// Updates an existing price alert (creator only)
+// Body: { conditionType, price, notifyChannels, enabled }
+// Response: { message: 'Price alert updated successfully', alert }
 router.put('/price-alert/:alertId', authenticateToken, async (req, res) => {
     try {
         const alert = await PriceAlert.findById(req.params.alertId);
@@ -160,6 +182,9 @@ router.put('/price-alert/:alertId', authenticateToken, async (req, res) => {
 });
 
 // Delete price alert
+// DELETE /api/market/price-alert/:alertId
+// Deletes a price alert (creator only)
+// Response: { message: 'Price alert deleted successfully' }
 router.delete('/price-alert/:alertId', authenticateToken, async (req, res) => {
     try {
         const alert = await PriceAlert.findById(req.params.alertId);

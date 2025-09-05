@@ -9,6 +9,10 @@ const AuditLog = require('../models/AuditLog');
 const router = express.Router();
 
 // Create a new club
+// POST /api/clubs/
+// Creates a new investment club with the authenticated user as owner
+// Body: { name, description, minContribution, currency, votingMode, approvalThresholdPercent, votingPeriodDays, isPublic, settings }
+// Response: { message: 'Club created successfully', club }
 router.post('/', authenticateToken, [
     body('name').notEmpty().withMessage('Club name is required'),
     body('description').optional()
@@ -60,6 +64,9 @@ router.post('/', authenticateToken, [
 });
 
 // Get all clubs (with membership info for authenticated user)
+// GET /api/clubs/
+// Retrieves all clubs with membership status for the current user
+// Response: Array of clubs with membership details
 router.get('/', authenticateToken, async (req, res) => {
     try {
         const clubs = await Club.find({}).populate('ownerId', 'firstName lastName username');
@@ -85,6 +92,9 @@ router.get('/', authenticateToken, async (req, res) => {
 });
 
 // Get club by ID
+// GET /api/clubs/:clubId
+// Retrieves detailed information about a specific club
+// Response: Club details with membership info and member count
 router.get('/:clubId', authenticateToken, async (req, res) => {
     try {
         const club = await Club.findById(req.params.clubId).populate('ownerId', 'firstName lastName username');
@@ -115,6 +125,10 @@ router.get('/:clubId', authenticateToken, async (req, res) => {
 });
 
 // Update club
+// PUT /api/clubs/:clubId
+// Updates club settings (owner/admin only)
+// Body: { name, description, minContribution, currency, votingMode, approvalThresholdPercent, votingPeriodDays, isPublic, settings }
+// Response: { message: 'Club updated successfully', club }
 router.put('/:clubId', authenticateToken, async (req, res) => {
     try {
         const club = await Club.findById(req.params.clubId);
@@ -154,6 +168,9 @@ router.put('/:clubId', authenticateToken, async (req, res) => {
 });
 
 // Delete club
+// DELETE /api/clubs/:clubId
+// Soft deletes a club (owner only)
+// Response: { message: 'Club deleted successfully' }
 router.delete('/:clubId', authenticateToken, async (req, res) => {
     try {
         const club = await Club.findById(req.params.clubId);
@@ -187,6 +204,9 @@ router.delete('/:clubId', authenticateToken, async (req, res) => {
 });
 
 // Join club
+// POST /api/clubs/:clubId/join
+// Allows user to join a public club
+// Response: { message: 'Joined club successfully', membership }
 router.post('/:clubId/join', authenticateToken, async (req, res) => {
     try {
         const club = await Club.findById(req.params.clubId);
@@ -226,6 +246,9 @@ router.post('/:clubId/join', authenticateToken, async (req, res) => {
 });
 
 // Get club members
+// GET /api/clubs/:clubId/members
+// Retrieves all members of a club (members only)
+// Response: Array of club members with user details
 router.get('/:clubId/members', authenticateToken, async (req, res) => {
     try {
         const membership = await ClubMember.findOne({ clubId: req.params.clubId, userId: req.user._id });
@@ -245,6 +268,10 @@ router.get('/:clubId/members', authenticateToken, async (req, res) => {
 });
 
 // Update member role
+// PUT /api/clubs/:clubId/members/:userId
+// Updates a member's role in the club (owner/admin only)
+// Body: { role: 'owner' | 'admin' | 'treasurer' | 'member' }
+// Response: { message: 'Member role updated successfully', membership }
 router.put('/:clubId/members/:userId', authenticateToken, async (req, res) => {
     try {
         const club = await Club.findById(req.params.clubId);
@@ -286,6 +313,9 @@ router.put('/:clubId/members/:userId', authenticateToken, async (req, res) => {
 });
 
 // Remove member
+// DELETE /api/clubs/:clubId/members/:userId
+// Removes a member from the club (owner/admin only)
+// Response: { message: 'Member removed successfully' }
 router.delete('/:clubId/members/:userId', authenticateToken, async (req, res) => {
     try {
         const club = await Club.findById(req.params.clubId);

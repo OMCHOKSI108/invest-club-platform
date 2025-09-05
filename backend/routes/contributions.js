@@ -9,6 +9,10 @@ const AuditLog = require('../models/AuditLog');
 const router = express.Router();
 
 // Create contribution
+// POST /api/clubs/:clubId/contributions
+// Creates a new contribution request for the authenticated user
+// Body: { amount, currency, note }
+// Response: { message: 'Contribution created successfully', contribution }
 router.post('/:clubId/contributions', authenticateToken, [
     body('amount').isNumeric().withMessage('Amount must be a number'),
     body('currency').optional(),
@@ -54,6 +58,9 @@ router.post('/:clubId/contributions', authenticateToken, [
 });
 
 // Get club contributions
+// GET /api/clubs/:clubId/contributions
+// Retrieves all contributions for a club (members only)
+// Response: Array of contributions with user and approver details
 router.get('/:clubId/contributions', authenticateToken, async (req, res) => {
     try {
         const membership = await ClubMember.findOne({ clubId: req.params.clubId, userId: req.user._id });
@@ -74,6 +81,10 @@ router.get('/:clubId/contributions', authenticateToken, async (req, res) => {
 });
 
 // Create manual contribution (treasurer/admin only)
+// POST /api/clubs/:clubId/contributions/manual
+// Creates a contribution entry for another user (treasurer/admin/owner only)
+// Body: { userId, amount, currency, note }
+// Response: { message: 'Manual contribution created successfully', contribution }
 router.post('/:clubId/contributions/manual', authenticateToken, [
     body('userId').isMongoId().withMessage('Valid user ID required'),
     body('amount').isNumeric().withMessage('Amount must be a number'),
@@ -127,6 +138,9 @@ router.post('/:clubId/contributions/manual', authenticateToken, [
 });
 
 // Approve manual contribution
+// PUT /api/clubs/:clubId/contributions/:contributionId/approve
+// Approves a pending manual contribution and creates transaction (treasurer/admin/owner only)
+// Response: { message: 'Contribution approved successfully', contribution, transaction }
 router.put('/:clubId/contributions/:contributionId/approve', authenticateToken, async (req, res) => {
     try {
         const membership = await ClubMember.findOne({ clubId: req.params.clubId, userId: req.user._id });

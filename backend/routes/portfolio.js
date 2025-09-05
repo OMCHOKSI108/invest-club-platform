@@ -8,6 +8,9 @@ const Transaction = require('../models/Transaction');
 const router = express.Router();
 
 // Get club portfolio
+// GET /api/clubs/:clubId/portfolio
+// Retrieves portfolio overview including positions, recent transactions, and summary
+// Response: { positions, transactions, summary: { totalValue, positionCount, transactionCount } }
 router.get('/:clubId/portfolio', authenticateToken, async (req, res) => {
     try {
         const membership = await ClubMember.findOne({ clubId: req.params.clubId, userId: req.user._id });
@@ -40,6 +43,9 @@ router.get('/:clubId/portfolio', authenticateToken, async (req, res) => {
 });
 
 // Get positions
+// GET /api/clubs/:clubId/positions
+// Retrieves all investment positions for the club (members only)
+// Response: Array of positions
 router.get('/:clubId/positions', authenticateToken, async (req, res) => {
     try {
         const membership = await ClubMember.findOne({ clubId: req.params.clubId, userId: req.user._id });
@@ -56,6 +62,10 @@ router.get('/:clubId/positions', authenticateToken, async (req, res) => {
 });
 
 // Create order
+// POST /api/clubs/:clubId/orders
+// Creates a new buy/sell order for the club portfolio
+// Body: { type: 'buy'|'sell', symbol, quantity, orderType: 'market'|'limit', limitPrice }
+// Response: { message: 'Order created successfully', order }
 router.post('/:clubId/orders', authenticateToken, [
     require('express-validator').body('type').isIn(['buy', 'sell']).withMessage('Type must be buy or sell'),
     require('express-validator').body('symbol').notEmpty().withMessage('Symbol is required'),
@@ -105,6 +115,9 @@ router.post('/:clubId/orders', authenticateToken, [
 });
 
 // Get orders
+// GET /api/clubs/:clubId/orders
+// Retrieves all orders for the club (members only)
+// Response: Array of orders with creator details
 router.get('/:clubId/orders', authenticateToken, async (req, res) => {
     try {
         const membership = await ClubMember.findOne({ clubId: req.params.clubId, userId: req.user._id });
@@ -124,6 +137,9 @@ router.get('/:clubId/orders', authenticateToken, async (req, res) => {
 });
 
 // Get transactions
+// GET /api/clubs/:clubId/transactions
+// Retrieves all financial transactions for the club (members only)
+// Response: Array of transactions with creator details
 router.get('/:clubId/transactions', authenticateToken, async (req, res) => {
     try {
         const membership = await ClubMember.findOne({ clubId: req.params.clubId, userId: req.user._id });
@@ -143,6 +159,9 @@ router.get('/:clubId/transactions', authenticateToken, async (req, res) => {
 });
 
 // Get audit logs
+// GET /api/clubs/:clubId/audit-logs
+// Retrieves audit logs for the club (members only, latest 100)
+// Response: Array of audit logs with user details
 router.get('/:clubId/audit-logs', authenticateToken, async (req, res) => {
     try {
         const membership = await ClubMember.findOne({ clubId: req.params.clubId, userId: req.user._id });

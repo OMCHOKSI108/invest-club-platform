@@ -10,6 +10,10 @@ const AuditLog = require('../models/AuditLog');
 const router = express.Router();
 
 // Create proposal
+// POST /api/clubs/:clubId/proposals
+// Creates a new investment proposal for club voting
+// Body: { title, description, amount, assetType, assetSymbol, deadline, executionMethod }
+// Response: { message: 'Proposal created successfully', proposal }
 router.post('/:clubId/proposals', authenticateToken, [
     body('title').notEmpty().withMessage('Title is required'),
     body('amount').isNumeric().withMessage('Amount must be a number'),
@@ -73,6 +77,9 @@ router.post('/:clubId/proposals', authenticateToken, [
 });
 
 // Get club proposals
+// GET /api/clubs/:clubId/proposals
+// Retrieves all proposals for the club (members only)
+// Response: Array of proposals with creator details
 router.get('/:clubId/proposals', authenticateToken, async (req, res) => {
     try {
         const membership = await ClubMember.findOne({ clubId: req.params.clubId, userId: req.user._id });
@@ -92,6 +99,9 @@ router.get('/:clubId/proposals', authenticateToken, async (req, res) => {
 });
 
 // Get proposal by ID
+// GET /api/clubs/:clubId/proposals/:proposalId
+// Retrieves detailed information about a specific proposal including votes
+// Response: Proposal details with votes and user's vote status
 router.get('/:clubId/proposals/:proposalId', authenticateToken, async (req, res) => {
     try {
         const membership = await ClubMember.findOne({ clubId: req.params.clubId, userId: req.user._id });
@@ -123,6 +133,10 @@ router.get('/:clubId/proposals/:proposalId', authenticateToken, async (req, res)
 });
 
 // Vote on proposal
+// POST /api/clubs/:clubId/proposals/:proposalId/vote
+// Casts a vote on an active proposal (members only)
+// Body: { vote: 'yes'|'no', comment }
+// Response: { message: 'Vote cast successfully', vote }
 router.post('/:clubId/proposals/:proposalId/vote', authenticateToken, [
     body('vote').isIn(['yes', 'no']).withMessage('Vote must be yes or no'),
     body('comment').optional()
@@ -193,6 +207,9 @@ router.post('/:clubId/proposals/:proposalId/vote', authenticateToken, [
 });
 
 // Close proposal
+// POST /api/clubs/:clubId/proposals/:proposalId/close
+// Closes an active proposal and determines approval based on votes (owner/admin only)
+// Response: { message: 'Proposal approved/rejected', proposal }
 router.post('/:clubId/proposals/:proposalId/close', authenticateToken, async (req, res) => {
     try {
         const membership = await ClubMember.findOne({ clubId: req.params.clubId, userId: req.user._id });
@@ -234,6 +251,9 @@ router.post('/:clubId/proposals/:proposalId/close', authenticateToken, async (re
 });
 
 // Execute approved proposal
+// POST /api/clubs/:clubId/proposals/:proposalId/execute
+// Executes an approved proposal by creating an order (owner/admin/treasurer only)
+// Response: { message: 'Proposal execution started', proposal, order }
 router.post('/:clubId/proposals/:proposalId/execute', authenticateToken, async (req, res) => {
     try {
         const membership = await ClubMember.findOne({ clubId: req.params.clubId, userId: req.user._id });

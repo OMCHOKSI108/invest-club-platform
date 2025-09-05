@@ -13,6 +13,10 @@ const generateOTP = () => {
 };
 
 // Signup
+// POST /api/auth/signup
+// Registers a new user, generates OTP, and sends it to the user's email for verification
+// Body: { firstName, lastName, username, number, email, password }
+// Response: { message: 'OTP sent to email' }
 router.post('/signup', [
     body('firstName').notEmpty().withMessage('First name is required'),
     body('lastName').notEmpty().withMessage('Last name is required'),
@@ -59,6 +63,10 @@ router.post('/signup', [
 });
 
 // Verify Signup OTP
+// POST /api/auth/verify-signup
+// Verifies the OTP sent during signup and completes user registration
+// Body: { email, otp }
+// Response: { message: 'Signup successful', token }
 router.post('/verify-signup', [
     body('email').isEmail().withMessage('Valid email is required'),
     body('otp').notEmpty().withMessage('OTP is required')
@@ -91,6 +99,10 @@ router.post('/verify-signup', [
 });
 
 // Login
+// POST /api/auth/login
+// Authenticates user with email/username and password, returns JWT token
+// Body: { identifier (email or username), password }
+// Response: { message: 'Login successful', token }
 router.post('/login', [
     body('identifier').notEmpty().withMessage('Email or username is required'),
     body('password').notEmpty().withMessage('Password is required')
@@ -123,6 +135,10 @@ router.post('/login', [
 });
 
 // Forgot Password
+// POST /api/auth/forgot-password
+// Generates and sends a temporary password to the user's email for password reset
+// Body: { email }
+// Response: { message: 'Temporary password sent to your email' }
 router.post('/forgot-password', [
     body('email').isEmail().withMessage('Valid email is required')
 ], async (req, res) => {
@@ -163,8 +179,10 @@ router.post('/forgot-password', [
 module.exports = router;
 
 // Test email endpoint (dev helper)
-// POST /api/auth/test-email { "email": "you@example.com" }
-// Sends an OTP (or logs it when SMTP is not available).
+// POST /api/auth/test-email
+// Sends an OTP to the provided email for testing purposes (development only)
+// Body: { email }
+// Response: { message: 'Test OTP processed', email, otp (only in dev mode) }
 router.post('/test-email', async (req, res) => {
     const { email } = req.body || {};
     if (!email) return res.status(400).json({ message: 'email is required' });

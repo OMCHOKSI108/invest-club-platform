@@ -35,6 +35,10 @@ const upload = multer({
 });
 
 // Upload file
+// POST /api/clubs/:clubId/files
+// Uploads a file to the club (members only)
+// Form data: file (multipart/form-data)
+// Response: { message: 'File uploaded successfully', file }
 router.post('/:clubId/files', authenticateToken, upload.single('file'), async (req, res) => {
     try {
         const membership = await ClubMember.findOne({ clubId: req.params.clubId, userId: req.user._id });
@@ -65,6 +69,9 @@ router.post('/:clubId/files', authenticateToken, upload.single('file'), async (r
 });
 
 // Get club files
+// GET /api/clubs/:clubId/files
+// Retrieves all files uploaded to the club (members only)
+// Response: Array of files with uploader details
 router.get('/:clubId/files', authenticateToken, async (req, res) => {
     try {
         const membership = await ClubMember.findOne({ clubId: req.params.clubId, userId: req.user._id });
@@ -84,6 +91,9 @@ router.get('/:clubId/files', authenticateToken, async (req, res) => {
 });
 
 // Delete file
+// DELETE /api/clubs/:clubId/files/:fileId
+// Deletes a file from the club (uploader or owner/admin only)
+// Response: { message: 'File deleted successfully' }
 router.delete('/:clubId/files/:fileId', authenticateToken, async (req, res) => {
     try {
         const file = await File.findById(req.params.fileId);
