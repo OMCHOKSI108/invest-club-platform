@@ -6,6 +6,10 @@ const ClubMember = require('../models/ClubMember');
 const router = express.Router();
 
 // Generate report
+// POST /api/clubs/:clubId/reports/generate
+// Initiates generation of a report for the club (members only)
+// Body: { type, params }
+// Response: { message: 'Report generation started', job }
 router.post('/:clubId/reports/generate', authenticateToken, [
     require('express-validator').body('type').notEmpty().withMessage('Report type is required'),
     require('express-validator').body('params').optional()
