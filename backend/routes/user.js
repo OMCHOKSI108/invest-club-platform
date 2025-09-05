@@ -5,6 +5,9 @@ const User = require('../models/User');
 const router = express.Router();
 
 // Get user profile (protected route)
+// GET /api/user/profile
+// Retrieves the authenticated user's profile information
+// Response: User profile data (excluding sensitive fields)
 router.get('/profile', authenticateToken, async (req, res) => {
     try {
         const user = await User.findById(req.user._id).select('-password -otp -otpExpires');
@@ -16,6 +19,10 @@ router.get('/profile', authenticateToken, async (req, res) => {
 });
 
 // Update user profile (protected route)
+// PUT /api/user/profile
+// Updates the authenticated user's profile information
+// Body: { firstName, lastName, number }
+// Response: { message: 'Profile updated successfully', user }
 router.put('/profile', authenticateToken, async (req, res) => {
     try {
         const { firstName, lastName, number } = req.body;
