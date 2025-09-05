@@ -41,6 +41,10 @@ router.put('/profile', authenticateToken, async (req, res) => {
 });
 
 // Change password (protected route)
+// PUT /api/user/change-password
+// Changes the authenticated user's password
+// Body: { currentPassword, newPassword }
+// Response: { message: 'Password changed successfully' }
 router.put('/change-password', authenticateToken, async (req, res) => {
     try {
         const { currentPassword, newPassword } = req.body;
