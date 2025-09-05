@@ -51,6 +51,9 @@ router.post('/:clubId/reports/generate', authenticateToken, [
 });
 
 // Get report job status
+// GET /api/reports/jobs/:jobId
+// Retrieves the status of a report generation job (club members only)
+// Response: Report job details with status and result URL
 router.get('/reports/jobs/:jobId', authenticateToken, async (req, res) => {
     try {
         const job = await ReportJob.findById(req.params.jobId);
@@ -72,6 +75,9 @@ router.get('/reports/jobs/:jobId', authenticateToken, async (req, res) => {
 });
 
 // Get club report jobs
+// GET /api/clubs/:clubId/reports/jobs
+// Retrieves all report generation jobs for the club (members only)
+// Response: Array of report jobs
 router.get('/:clubId/reports/jobs', authenticateToken, async (req, res) => {
     try {
         const membership = await ClubMember.findOne({ clubId: req.params.clubId, userId: req.user._id });
