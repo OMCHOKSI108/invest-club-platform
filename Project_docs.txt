@@ -1,1 +1,207 @@
 
+Project Overview
+
+The Investment Club Platform is a collaborative system where small groups of users can pool funds and invest collectively. The backend is built with Node.js, Express, and MongoDB (Mongoose), and integrates with a FastAPI microservice for real-time Indian stock market data. Each club has its own members, roles, contribution pool, proposals, voting, portfolio, and audit logs. The system enforces secure authentication, OTP verification, weighted voting, and immutable audit logging to ensure compliance and transparency.
+
+
+---
+
+Features
+
+Authentication & Security: Signup with OTP verification, JWT tokens, refresh tokens, and password reset flows.
+
+Clubs & Membership: Create clubs, invite/join members, assign roles (owner, admin, treasurer, member).
+
+Contributions & Payments: Support for online payments (Razorpay/Stripe), manual entries, idempotent webhook processing.
+
+Proposals & Voting: Create investment proposals, vote in simple or weighted mode, enforce thresholds and quorum.
+
+Portfolio & Orders: Track positions, NAV, allocation, execute buy/sell orders, reconcile broker updates.
+
+Market Data Integration: Real-time quotes, historical data, subscriptions, and price alerts from FastAPI stock service.
+
+Transactions & Audit: Immutable ledger of all contributions, trades, payouts, and role changes.
+
+Reports & Exports: Generate club financial reports in PDF/CSV formats (async jobs).
+
+KYC & Compliance: Upload and verify identity documents, admin approval workflow.
+
+Files & Notifications: Upload receipts and agreements, real-time chat/alerts via WebSockets.
+
+Admin & Monitoring: Admin views for all users/clubs, system health, metrics, and broadcast messaging.
+
+
+
+---
+
+Workflow
+
+1. A new user signs up, verifies email OTP, and logs in.
+
+
+2. The user creates a club or joins one via invite link/token.
+
+
+3. Members contribute funds (via online payment or manual approval).
+
+
+4. A member creates a proposal to invest in a stock or asset.
+
+
+5. Eligible members vote on the proposal (simple or weighted).
+
+
+6. If approved, treasurer/admin executes the order manually or via broker API.
+
+
+7. Positions update in the portfolio, NAV and P/L are recalculated.
+
+
+8. Transactions and audit logs record all actions immutably.
+
+
+9. Members view reports, exports, and receive notifications.
+
+
+
+
+---
+
+System Architecture
+
+Backend: Node.js + Express with TypeScript, Mongoose for MongoDB.
+
+Microservice: FastAPI for stock data (quotes, historical, indices).
+
+Database: MongoDB Atlas (primary store).
+
+Cache/Jobs: Redis for caching quotes and scheduling jobs.
+
+File Storage: S3-compatible service for receipts and documents.
+
+Real-time: WebSocket/Socket.IO for chat and notifications.
+
+Deployment: Render/Heroku/DigitalOcean for services, Dockerized builds.
+
+
+
+---
+
+Data Models (Core)
+
+User: Profile, credentials, roles, KYC status.
+
+Club: Settings, rules, owner, metadata.
+
+ClubMember: Membership per club, role, contribution snapshot.
+
+Contribution: Payment entries, provider info, status.
+
+Transaction: Ledger entries for contributions, trades, payouts.
+
+Proposal: Investment ideas with weight snapshot and status.
+
+Vote: One per user per proposal with weight.
+
+Position: Holdings per club symbol with avgPrice and quantity.
+
+Order: Buy/sell orders linked to broker/webhook.
+
+MarketSubscription: Symbols tracked per club.
+
+PriceAlert: Club-specific alerts on market conditions.
+
+AuditLog: Immutable log of sensitive events.
+
+KYC: Documents and verification status.
+
+Notification: Alerts to users.
+
+ReportJob: Async reports with download links.
+
+File: Uploaded receipts/agreements.
+
+WebhookEvent: Deduplication of incoming events.
+
+
+
+---
+
+Voting Logic
+
+Simple voting: Each member = 1 vote. Majority wins.
+
+Weighted voting: Each vote weight = member’s contribution/share %.
+
+Snapshots: Voting weights frozen at proposal creation to prevent gaming.
+
+Threshold: Default approval threshold = 60% yes weight.
+
+Quorum: Optional rule requiring minimum % participation.
+
+Tie Handling: Configurable (default = reject on tie).
+
+
+
+---
+
+Deployment
+
+1. Deploy FastAPI stock service to Render (with Docker + render.yaml).
+
+
+2. Deploy Node backend as web service (with Dockerfile).
+
+
+3. Use MongoDB Atlas for database, Redis Cloud for cache/jobs.
+
+
+4. Configure environment variables for DB, JWT, payments, S3, FastAPI base URL.
+
+
+5. Expose /api/health and /api/ready for monitoring.
+
+
+6. Set up background workers for closing proposals, fetching market data, and generating reports.
+
+
+
+
+---
+
+Security
+
+Enforce JWT auth with Bearer tokens.
+
+Role-based access per club (owner/admin/treasurer/member).
+
+Validate and verify webhook signatures.
+
+Use idempotency for all financial endpoints.
+
+Store all sensitive actions in AuditLog.
+
+Limit request rates on auth endpoints.
+
+Scan file uploads and restrict size/type.
+
+
+
+---
+
+Future Enhancements
+
+Mobile app integration with same backend APIs.
+
+Social features: club discovery, public performance dashboards.
+
+AI-driven proposal suggestions based on market trends.
+
+Automated portfolio rebalancing strategies.
+
+Multi-currency support and forex integration.
+
+Advanced reporting with benchmarking vs indices.
+
+
+
