@@ -4,7 +4,7 @@ The backend is a Node.js + Express + MongoDB (Mongoose) service that powers the 
 
 
 ---
-
+```
 Authentication Endpoints
 
 Base URL: /api/auth
@@ -30,8 +30,9 @@ POST /logout → Invalidate refresh token.
 POST /forgot-password → Send temporary password to email.
 
 
-
+```
 ---
+```
 
 User Endpoints
 
@@ -48,9 +49,9 @@ POST /kyc → Upload KYC documents.
 GET /kyc/status → Get KYC verification status.
 
 
-
+```
 ---
-
+```
 Club Endpoints
 
 Base URL: /api/clubs
@@ -78,9 +79,9 @@ DELETE /:clubId/members/:userId → Remove member.
 POST /:clubId/leave → Leave club.
 
 
-
+```
 ---
-
+```
 Contribution & Payment Endpoints
 
 Base URL: /api/clubs/:clubId/contributions
@@ -99,9 +100,9 @@ Webhook:
 POST /api/payments/webhook → Handle payment provider events (idempotent).
 
 
-
+```
 ---
-
+```
 Proposal & Voting Endpoints
 
 Base URL: /api/clubs/:clubId/proposals
@@ -119,9 +120,9 @@ POST /:proposalId/close → Close proposal (auto/owner).
 POST /:proposalId/execute → Execute approved proposal (treasurer/admin).
 
 
-
+```
 ---
-
+```
 Portfolio, Positions & Orders
 
 Base URL: /api/clubs/:clubId
@@ -142,9 +143,9 @@ Webhook:
 POST /api/broker/webhook → Broker order update (fills).
 
 
-
+```
 ---
-
+```
 Transactions & Audit
 
 Base URL: /api/clubs/:clubId
@@ -154,9 +155,9 @@ GET /transactions → List transactions (contributions, buys, sells, payouts, fe
 GET /audit-logs → Immutable audit logs (admin only).
 
 
-
+```
 ---
-
+```
 Market Data Integration
 
 Base URL: /api/market
@@ -176,9 +177,9 @@ POST /alert → Create price alert { symbol, conditionType, price }.
 POST /price-webhook → Internal price update webhook (from FastAPI worker).
 
 
-
+```
 ---
-
+```
 Files, Reports & Notifications
 
 POST /api/clubs/:clubId/files → Upload file (receipt, agreement).
@@ -196,9 +197,9 @@ GET /api/notifications → Get notifications.
 POST /api/notifications/mark-read → Mark notifications as read.
 
 
-
+```
 ---
-
+```
 Admin & System
 
 GET /api/admin/users → List all users.
@@ -214,7 +215,7 @@ GET /api/health → Health check.
 GET /api/metrics → Internal metrics.
 
 
-
+```
 ---
 
 Notes
