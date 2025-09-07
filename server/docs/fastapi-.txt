@@ -1,0 +1,72 @@
+# FastAPI Stock API Endpoints
+
+## Health Check
+GET /health
+- Description: Check if the API is running
+- Response: {"status": "ok"}
+
+## Get All Quotes
+GET /quotes
+- Description: Get real-time quotes for all subscribed stocks
+- Response: {"SYMBOL.NS": {"symbol": "SYMBOL.NS", "price": 123.45, "timestamp": "2025-09-05T10:30:00"}}
+
+## Get Single Quote
+GET /quote/{symbol}
+- Description: Get quote for a specific stock from cache
+- Parameters: symbol (e.g., RELIANCE.NS)
+- Response: {"symbol": "RELIANCE.NS", "price": 2500.5, "timestamp": "2025-09-05T10:30:00"}
+
+## Fetch Quote On-Demand
+GET /fetch/{symbol}
+- Description: Fetch quote directly from provider and cache it
+- Parameters: symbol (e.g., TCS.NS)
+- Response: Same as single quote
+
+## Subscribe to Stock
+POST /subscribe
+- Description: Add a stock to subscription list
+- Body: {"symbol": "NEWSTOCK.NS"}
+- Response: {"detail": "subscribed", "symbol": "NEWSTOCK.NS"}
+
+## Unsubscribe from Stock
+DELETE /unsubscribe/{symbol}
+- Description: Remove a stock from subscription list
+- Parameters: symbol (e.g., INFY.NS)
+- Response: {"detail": "unsubscribed", "symbol": "INFY.NS"}
+
+## Get Historical Data
+GET /historical/{symbol}?period=1d
+- Description: Get historical price data for a symbol
+- Parameters: symbol (e.g., RELIANCE.NS), period (1d, 5d, 1mo, etc.)
+- Response: {"symbol": "RELIANCE.NS", "period": "1d", "data": [...]}
+- Example: /historical/RELIANCE.NS?period=5d
+
+## Get Crypto Price
+GET /crypto/{symbol}
+- Description: Get real-time cryptocurrency price from Binance
+- Parameters: symbol (e.g., BTCUSDT, ETHUSDT)
+- Response: {"symbol": "BTCUSDT", "price": "45000.50", "timestamp": "2025-09-05T10:30:00"}
+- Example: /crypto/BTCUSDT
+
+## Get Crypto Historical Data
+GET /crypto-historical/{symbol}?interval=1d&limit=100
+- Description: Get historical cryptocurrency data from Binance
+- Parameters: symbol (e.g., BTCUSDT), interval (1m, 5m, 1h, 1d, etc.), limit (max 1000)
+- Response: {"symbol": "BTCUSDT", "interval": "1d", "limit": 100, "data": [...]}
+- Example: /crypto-historical/BTCUSDT?interval=1h&limit=24
+
+## Interactive Documentation
+GET /docs
+- Description: Swagger UI for testing endpoints
+- Access: http://localhost:8000/docs
+
+## OpenAPI Schema
+GET /openapi.json
+- Description: OpenAPI JSON schema
+- Access: http://localhost:8000/openapi.json
+
+## Configuration
+- FETCH_INTERVAL: Interval in seconds for background fetching (default: 60)
+- PROVIDER: Data provider (YFINANCE, FINNHUB, ALPHAVANTAGE)
+- FETCH_SYMBOLS: Default symbols to subscribe to
+- API Keys: FINNHUB_KEY, ALPHAVANTAGE_KEY (for paid providers)
