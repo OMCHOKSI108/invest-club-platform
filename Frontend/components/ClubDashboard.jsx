@@ -70,22 +70,8 @@ const ClubDashboard = () => {
 
                 setStockData(symbols);
 
-                // Fetch portfolio data for the club
-                const portfolioResponse = await fetch(`http://localhost:3000/api/clubs/${clubId}/portfolio`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                });
-
-                if (portfolioResponse.ok) {
-                    const portfolio = await portfolioResponse.json();
-                    // Use symbols from club data for historical data
-                    await fetchHistoricalData(symbols);
-                } else {
-                    // Still fetch historical data even if portfolio fails
-                    await fetchHistoricalData(symbols);
-                }
+                // Fetch historical data
+                await fetchHistoricalData(symbols);
 
             } catch (err) {
                 console.error('Error fetching club data:', err);
@@ -97,26 +83,6 @@ const ClubDashboard = () => {
 
         fetchClubData();
     }, [clubId]);
-
-    const extractSymbolsFromPortfolio = (portfolio) => {
-        // Extract unique symbols from portfolio positions
-        const symbols = new Set();
-
-        if (portfolio && portfolio.positions) {
-            portfolio.positions.forEach(position => {
-                if (position.symbol) {
-                    symbols.add(position.symbol);
-                }
-            });
-        }
-
-        // If no positions found, use default symbols for demo
-        if (symbols.size === 0) {
-            return ['AAPL', 'GOOGL', 'BTC', 'ETH'];
-        }
-
-        return Array.from(symbols);
-    };
 
     const fetchHistoricalData = async (symbols) => {
         try {
@@ -134,13 +100,65 @@ const ClubDashboard = () => {
 
                 for (const symbol of symbols) {
                     try {
-                        const response = await fetch(`/api/stock/historical/${symbol}?period=${periodMappings[period]}`);
-                        if (response.ok) {
-                            const data = await response.json();
-                            if (data.data && data.data.length > 0) {
-                                // Calculate return for this symbol
-                                const firstPrice = data.data[0].close;
-                                const lastPrice = data.data[data.data.length - 1].close;
+                        // COMMENTED OUT API CODE - Using static data instead
+                        /*
+                        // Create AbortController for timeout
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+                        // List of known Indian stock symbols (with .NS suffix as used in API)
+                        const indianStocks = ['RELIANCE.NS', 'TCS.NS', 'HDFCBANK.NS', 'ICICIBANK.NS', 'HINDUNILVR.NS', 'INFY.NS', 'ITC.NS', 'SBIN.NS', 'BHARTIARTL.NS', 'KOTAKBANK.NS', 'BAJFINANCE.NS', 'LT.NS', 'HCLTECH.NS', 'ASIANPAINT.NS', 'MARUTI.NS', 'AXISBANK.NS', 'WIPRO.NS', 'ULTRACEMCO.NS', 'TITAN.NS', 'NESTLEIND.NS', 'SUNPHARMA.NS', 'POWERGRID.NS', 'TECHM.NS', 'M&M.NS', 'NTPC.NS', 'TATAMOTORS.NS', 'BAJAJFINSV.NS', 'JSWSTEEL.NS', 'INDUSINDBK.NS', 'GRASIM.NS', 'ADANIENT.NS', 'COALINDIA.NS', 'CIPLA.NS', 'DRREDDY.NS', 'EICHERMOT.NS', 'ONGC.NS', 'BRITANNIA.NS', 'DIVISLAB.NS', 'TATACONSUM.NS', 'BAJAJ-AUTO.NS', 'APOLLOHOSP.NS', 'HINDALCO.NS', 'HEROMOTOCO.NS', 'UPL.NS', 'ADANIPORTS.NS', 'GODREJCP.NS', 'PIDILITIND.NS', 'BANDHANBNK.NS', 'BERGEPAINT.NS', 'COLPAL.NS', 'DABUR.NS', 'HAVELLS.NS', 'MARICO.NS', 'SRF.NS', 'VOLTAS.NS', 'SIEMENS.NS', 'BAJAJHLDNG.NS', 'DLF.NS', 'GAIL.NS', 'JINDALSTEL.NS', 'MOTHERSON.NS', 'PAGEIND.NS', 'TORNTPHARM.NS', 'AMBUJACEM.NS', 'BANKBARODA.NS', 'BPCL.NS', 'CADILAHC.NS', 'CANBK.NS', 'CONCOR.NS', 'CUB.NS', 'FEDERALBNK.NS', 'GUJGASLTD.NS', 'HDFCLIFE.NS', 'HDFC.NS', 'IBULHSGFIN.NS', 'ICICIPRULI.NS', 'INDIGO.NS', 'IOC.NS', 'LUPIN.NS', 'MCDOWELL-N.NS', 'NMDC.NS', 'PETRONET.NS', 'PFC.NS', 'RECLTD.NS', 'SAIL.NS', 'SHREECEM.NS', 'SBILIFE.NS', 'TATACHEM.NS', 'TATAPOWER.NS', 'TATASTEEL.NS', 'VEDL.NS', 'ZEEL.NS', 'ACC.NS', 'AUROPHARMA.NS', 'BIOCON.NS', 'BOSCHLTD.NS', 'ESCORTS.NS', 'EXIDEIND.NS', 'HINDZINC.NS', 'IBVENTURES.NS', 'LICHSGFIN.NS', 'MANAPPURAM.NS', 'MRF.NS', 'PEL.NS', 'PFIZER.NS', 'PNB.NS', 'RBLBANK.NS', 'SRTRANSFIN.NS', 'TVSMOTOR.NS', 'UNIONBANK.NS', 'YESBANK.NS', 'ABCAPITAL.NS', 'ALKEM.NS', 'APLLTD.NS', 'ASHOKLEY.NS', 'AIAENG.NS', 'BEL.NS', 'BHARATFORG.NS', 'CESC.NS', 'CHOLAFIN.NS', 'CROMPTON.NS', 'DELTACORP.NS', 'DIXON.NS', 'EQUITAS.NS', 'FORTIS.NS', 'FSL.NS', 'GMRINFRA.NS', 'GRAPHITE.NS', 'HATHWAY.NS', 'IDFCFIRSTB.NS', 'INOXLEISUR.NS', 'IGL.NS', 'ISEC.NS', 'JKCEMENT.NS', 'KEI.NS', 'L&TFH.NS', 'LALPATHLAB.NS', 'MINDTREE.NS', 'MPHASIS.NS', 'NATIONALUM.NS', 'NAVINFLUOR.NS', 'NHPC.NS', 'NIITLTD.NS', 'OBEROIRLTY.NS', 'PERSISTENT.NS', 'POLYCAB.NS', 'PVR.NS', 'RAMCOCEM.NS', 'RAYMOND.NS', 'RELAXO.NS', 'RENUKA.NS', 'SHRIRAMFIN.NS', 'SOBHA.NS', 'SOLARINDS.NS', 'SPARC.NS', 'SUNTV.NS', 'SUPREMEIND.NS', 'SYNGENE.NS', 'TANLA.NS', 'TEAMLEASE.NS', 'THERMAX.NS', 'TV18BRDCST.NS', 'TVSMOTOR.NS', 'UNIONBANK.NS', 'VAKRANGEE.NS', 'VINATIORGA.NS', 'VIPIND.NS', 'VTL.NS', 'WELCORP.NS', 'WHIRLPOOL.NS', 'YESBANK.NS', 'ZENSARTECH.NS'];
+                        const cryptoSymbols = ['BTC', 'ETH', 'BNB', 'ADA', 'SOL', 'DOT', 'DOGE', 'AVAX', 'UNI', 'AAVE', 'COMP', 'MKR', 'SUSHI', 'LINK', 'CRV', 'YFI'];
+                        const usStocks = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'META', 'TSLA', 'BRK-B', 'AVGO', 'LLY', 'JPM', 'UNH', 'XOM', 'JNJ', 'V', 'PG', 'MA', 'HD', 'CVX', 'ABBV', 'BAC', 'PFE', 'KO', 'ASML', 'MRK', 'COST', 'PEP', 'TMO', 'WMT', 'CSCO', 'ABT', 'DIS', 'CRM', 'ACN', 'DHR', 'VZ', 'ADBE', 'NKE', 'TXN', 'NEE', 'MCD', 'RTX', 'QCOM', 'WFC', 'PM', 'BMY', 'UPS', 'AMGN', 'HON', 'T', 'SPGI', 'LOW', 'COP', 'GS', 'SBUX', 'UNP', 'ELV', 'DE', 'INTU', 'CAT', 'AMD', 'AXP', 'BKNG', 'GILD', 'MS', 'BA', 'MDT', 'TJX', 'SCHW', 'PLD', 'SYK', 'BLK', 'ADI', 'TMUS', 'AMT', 'CVS', 'MU', 'CI', 'SO', 'VRTX', 'NFLX', 'INTC', 'PYPL', 'CMCSA'];
+
+                        // Determine if it's Indian or US stock and use appropriate endpoint
+                        let apiUrl;
+                        if (indianStocks.includes(symbol)) {
+                            // Indian stock - use quote endpoint
+                            apiUrl = `${import.meta.env.VITE_FASTAPI_STOCK}/stocks/quote/IND/${symbol}`;
+                        } else if (cryptoSymbols.includes(symbol)) {
+                            // Crypto
+                            apiUrl = `${import.meta.env.VITE_FASTAPI_STOCK}/crypto/quote/${symbol}`;
+                        } else {
+                            // US stock - use quote endpoint
+                            apiUrl = `${import.meta.env.VITE_FASTAPI_STOCK}/stocks/quote/US/${symbol}`;
+                        }
+                        // Determine if it's Indian or US stock and use appropriate historical endpoint
+                        let historicalApiUrl;
+                        if (indianStocks.includes(symbol)) {
+                            // Indian stock - historical API expects .NS suffix
+                            historicalApiUrl = `${import.meta.env.VITE_FASTAPI_STOCK}/stocks/historical/IND/${symbol}?period=${periodMappings[period]}`;
+                        } else if (cryptoSymbols.includes(symbol)) {
+                            // Crypto - use crypto historical endpoint
+                            historicalApiUrl = `${import.meta.env.VITE_FASTAPI_STOCK}/crypto/historical/${symbol}?period=${periodMappings[period]}`;
+                        } else {
+                            // US stock
+                            historicalApiUrl = `${import.meta.env.VITE_FASTAPI_STOCK}/stocks/historical/US/${symbol}?period=${periodMappings[period]}`;
+                        }
+
+                        const historicalResponse = await fetch(historicalApiUrl, {
+                            signal: controller.signal,
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            }
+                        });
+
+                        clearTimeout(timeoutId);
+
+                        if (historicalResponse.ok) {
+                            const historicalData = await historicalResponse.json();
+
+                            if (historicalData && historicalData.historical_data && historicalData.historical_data.length > 0) {
+                                // Use real historical data
+                                const processedData = historicalData.historical_data.map(point => ({
+                                    date: new Date(point.date).toLocaleDateString(),
+                                    price: point.close || point.price
+                                }));
+
+                                // Calculate return
+                                const firstPrice = processedData[0].price;
+                                const lastPrice = processedData[processedData.length - 1].price;
                                 const symbolReturn = ((lastPrice - firstPrice) / firstPrice) * 100;
 
                                 totalReturn += symbolReturn;
@@ -149,15 +167,88 @@ const ClubDashboard = () => {
                                 // Add to chart data
                                 periodData.chartData.push({
                                     symbol,
-                                    data: data.data.map(point => ({
-                                        date: new Date(point.timestamp).toLocaleDateString(),
-                                        price: point.close
-                                    }))
+                                    data: processedData
+                                });
+                            } else {
+                                console.warn(`No historical data for ${symbol}, using fallback`);
+                                await generateFallbackData(symbol, period, periodData);
+                            }
+                        } else {
+                            console.warn(`Historical API returned ${historicalResponse.status} for ${symbol}, using fallback`);
+                            await generateFallbackData(symbol, period, periodData);
+                        }
+                        */
+
+                        // STATIC DATA INSTEAD OF API CALLS
+                        const generateStaticData = (symbol, period) => {
+                            const basePrice = Math.random() * 1000 + 100; // Random base price between 100-1100
+                            const volatility = Math.random() * 0.3 + 0.1; // Random volatility 10-40%
+                            const dataPoints = period === '1M' ? 30 : period === '6M' ? 180 : 365; // Days based on period
+
+                            const data = [];
+                            let currentPrice = basePrice;
+
+                            for (let i = dataPoints; i >= 0; i--) {
+                                const date = new Date();
+                                date.setDate(date.getDate() - i);
+                                const change = (Math.random() - 0.5) * volatility * currentPrice;
+                                currentPrice += change;
+                                currentPrice = Math.max(currentPrice, 1); // Ensure positive price
+
+                                data.push({
+                                    date: date.toLocaleDateString(),
+                                    price: Math.round(currentPrice * 100) / 100
                                 });
                             }
-                        }
+
+                            return data;
+                        };
+
+                        const processedData = generateStaticData(symbol, period);
+
+                        // Calculate return
+                        const firstPrice = processedData[0].price;
+                        const lastPrice = processedData[processedData.length - 1].price;
+                        const symbolReturn = ((lastPrice - firstPrice) / firstPrice) * 100;
+
+                        totalReturn += symbolReturn;
+                        dataPoints++;
+
+                        // Add to chart data
+                        periodData.chartData.push({
+                            symbol,
+                            data: processedData
+                        });
+
                     } catch (error) {
-                        console.error(`Error fetching ${symbol} for ${period}:`, error);
+                        console.error(`Error processing ${symbol}:`, error);
+                        // Generate fallback data for errors
+                        const generateFallbackData = (symbol, period, periodData) => {
+                            const basePrice = Math.random() * 500 + 50;
+                            const dataPoints = period === '1M' ? 30 : period === '6M' ? 180 : 365;
+
+                            const data = [];
+                            for (let i = 0; i < dataPoints; i++) {
+                                const date = new Date();
+                                date.setDate(date.getDate() - (dataPoints - i));
+                                data.push({
+                                    date: date.toLocaleDateString(),
+                                    price: basePrice + Math.sin(i * 0.1) * 20 + Math.random() * 10
+                                });
+                            }
+
+                            const firstPrice = data[0].price;
+                            const lastPrice = data[data.length - 1].price;
+                            const symbolReturn = ((lastPrice - firstPrice) / firstPrice) * 100;
+
+                            periodData.return += symbolReturn;
+                            periodData.chartData.push({
+                                symbol,
+                                data: data
+                            });
+                        };
+
+                        generateFallbackData(symbol, period, periodData);
                     }
                 }
 
@@ -187,6 +278,30 @@ const ClubDashboard = () => {
         }
     };
 
+    // Helper function to generate fallback data when API fails
+    const generateFallbackData = async (symbol, period, periodData) => {
+        try {
+            const numPoints = period === '1M' ? 30 : period === '6M' ? 180 : 365;
+            const mockData = [];
+            let price = 100 + Math.random() * 200; // Random starting price between 100-300
+
+            for (let i = 0; i < numPoints; i++) {
+                price += (Math.random() - 0.5) * price * 0.02; // Small daily changes
+                mockData.push({
+                    date: new Date(Date.now() - (numPoints - i) * 24 * 60 * 60 * 1000).toLocaleDateString(),
+                    price: Math.max(price, 0.01)
+                });
+            }
+
+            periodData.chartData.push({
+                symbol,
+                data: mockData
+            });
+        } catch (error) {
+            console.error(`Error generating fallback data for ${symbol}:`, error);
+        }
+    };
+
     // Line Chart Data for selected period
     const lineData = {
         labels: performanceData[selectedPeriod].chartData.length > 0
@@ -202,14 +317,119 @@ const ClubDashboard = () => {
         })),
     };
 
-    // Pie Chart Data
+    // Line Chart Options
+    const lineOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'top',
+                labels: {
+                    color: '#ffffff',
+                    font: {
+                        size: 12
+                    }
+                }
+            },
+            tooltip: {
+                backgroundColor: '#1a1a1a',
+                titleColor: '#ffffff',
+                bodyColor: '#ffffff',
+                borderColor: '#22c55e',
+                borderWidth: 1,
+                callbacks: {
+                    label: function (context) {
+                        return `${context.dataset.label}: $${context.parsed.y.toFixed(2)}`;
+                    }
+                }
+            }
+        },
+        scales: {
+            x: {
+                grid: {
+                    color: '#333333'
+                },
+                ticks: {
+                    color: '#cccccc'
+                }
+            },
+            y: {
+                grid: {
+                    color: '#333333'
+                },
+                ticks: {
+                    color: '#cccccc',
+                    callback: function (value) {
+                        return '$' + value.toFixed(2);
+                    }
+                }
+            }
+        },
+        interaction: {
+            mode: 'index',
+            intersect: false,
+        },
+        elements: {
+            point: {
+                radius: 4,
+                hoverRadius: 6
+            }
+        }
+    };
+
+    // Pie Chart Options
+    const pieOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    color: '#ffffff',
+                    font: {
+                        size: 12
+                    },
+                    padding: 20
+                }
+            },
+            tooltip: {
+                backgroundColor: '#1a1a1a',
+                titleColor: '#ffffff',
+                bodyColor: '#ffffff',
+                borderColor: '#22c55e',
+                borderWidth: 1,
+                callbacks: {
+                    label: function (context) {
+                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                        const percentage = ((context.parsed / total) * 100).toFixed(1);
+                        return `${context.label}: ${percentage}% ($${context.parsed.toFixed(2)})`;
+                    }
+                }
+            }
+        }
+    };
+
+    // Pie Chart Data - Asset Allocation
     const pieData = {
-        labels: stockData,
+        labels: ['US Stocks', 'Indian Stocks', 'Cryptocurrency'],
         datasets: [{
-            data: stockData.map(() => Math.random() * 100), // Placeholder data
-            backgroundColor: ["#22c55e", "#16a34a", "#4ade80", "#86efac", "#bbf7d0"],
-            borderWidth: 1,
-        }],
+            data: [
+                stockData.filter(symbol => !indianStocks.includes(symbol) && !cryptoSymbols.includes(symbol)).length * 25, // US stocks
+                stockData.filter(symbol => indianStocks.includes(symbol)).length * 25, // Indian stocks
+                stockData.filter(symbol => cryptoSymbols.includes(symbol)).length * 25  // Crypto
+            ],
+            backgroundColor: [
+                '#3b82f6', // Blue for US stocks
+                '#f59e0b', // Orange for Indian stocks
+                '#10b981'  // Green for crypto
+            ],
+            borderColor: [
+                '#1e40af',
+                '#d97706',
+                '#059669'
+            ],
+            borderWidth: 2
+        }]
     };
 
     if (loading) {
@@ -303,13 +523,17 @@ const ClubDashboard = () => {
                     {/* Line Chart */}
                     <div className="bg-[#0d0d0d] p-6 rounded-xl col-span-2">
                         <h3 className="font-semibold mb-4">{selectedPeriod} Performance</h3>
-                        <Line data={lineData} />
+                        <div className="h-64">
+                            <Line data={lineData} options={lineOptions} />
+                        </div>
                     </div>
 
                     {/* Pie Chart */}
                     <div className="bg-[#0d0d0d] p-6 rounded-xl">
                         <h3 className="font-semibold mb-4">Asset Allocation</h3>
-                        <Pie data={pieData} />
+                        <div className="h-64">
+                            <Pie data={pieData} options={pieOptions} />
+                        </div>
                     </div>
                 </div>
 
@@ -340,7 +564,7 @@ const ClubDashboard = () => {
                 <div className="bg-[#0d0d0d] p-6 rounded-xl">
                     <h3 className="font-semibold mb-4">Current Holdings</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        {stockData.map((symbol, index) => (
+                        {stockData.map((symbol) => (
                             <div key={symbol} className="bg-[#1a1a1a] p-4 rounded-lg">
                                 <h4 className="font-medium">{symbol}</h4>
                                 <p className="text-green-500 text-sm">+{performanceData[selectedPeriod].return.toFixed(2)}%</p>

@@ -20,7 +20,7 @@ export default function Clubs() {
 
   // <-- IMPORTANT: ensure this points at your backend
   // If you deploy backend to a different origin, set VITE_API_BASE in .env to that URL.
-  const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3000/api";
+  const API_BASE = import.meta.env.VITE_APP_API_BASE || "http://localhost:3000/api";
 
   // quick ping to check server connectivity (no server changes required)
   useEffect(() => {
@@ -142,6 +142,7 @@ export default function Clubs() {
         setJoinStatus((prev) => ({ ...prev, [clubId]: payload.message || "Failed to join club" }));
       }
     } catch (err) {
+      console.error('Error joining club:', err);
       setJoinStatus((prev) => ({ ...prev, [clubId]: "Network error joining club" }));
     } finally {
       setJoiningClubId(null);
@@ -182,7 +183,7 @@ export default function Clubs() {
             <pre className="text-xs text-red-200 overflow-x-auto mt-2">
               {pingOk.preview ? pingOk.preview : pingOk.error ? pingOk.error : `Status: ${pingOk.status}`}
             </pre>
-            <p className="text-sm text-red-300 mt-2">Tip: if this shows HTML, your frontend may be hitting the SPA (index.html). Ensure <code className="bg-black px-1 rounded">VITE_API_BASE</code> is the backend URL (e.g. http://localhost:3000/api).</p>
+            <p className="text-sm text-red-300 mt-2">Tip: if this shows HTML, your frontend may be hitting the SPA (index.html). Ensure <code className="bg-black px-1 rounded">VITE_APP_API_BASE</code> is the backend URL (e.g. http://localhost:3000/api).</p>
           </div>
         )}
 
@@ -201,7 +202,7 @@ export default function Clubs() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {clubs.map((club, i) => {
+            {clubs.map((club) => {
               const id = club._id || club.id || club.name;
               return (
                 <div key={id} className="bg-[#0d0d0d] p-6 rounded-xl shadow-md hover:bg-[#1a1a1a] transition">

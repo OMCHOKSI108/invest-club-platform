@@ -3,12 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     // Check if user is logged in
-    const token = localStorage.getItem('token');
     const checkAuth = () => {
       const currentToken = localStorage.getItem('token');
       setIsLoggedIn(!!currentToken);
@@ -42,7 +40,7 @@ const Navbar = () => {
       style={{ backgroundColor: "#131712" }}
     >
       {/* Logo + Brand */}
-  <Link to="/" className="flex items-center gap-2 font-bold text-lg" style={{ textDecoration: 'none' }}>
+      <Link to="/" className="flex items-center gap-2 font-bold text-lg" style={{ textDecoration: 'none' }}>
         <div className="w-5 h-5 bg-green-500 rounded-sm" />
         InvestPlatform
       </Link>

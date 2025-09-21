@@ -25,7 +25,7 @@ const FeaturedClubs = () => {
 
                     if (response.ok) {
                         const clubsData = await response.json();
-                        const transformedClubs = clubsData.map((club, index) => ({
+                        const transformedClubs = clubsData.map((club) => ({
                             id: club._id,
                             name: club.name,
                             description: club.description || "A great investment club for growing wealth together.",
@@ -34,7 +34,7 @@ const FeaturedClubs = () => {
                             monthlyReturn: `+${(Math.random() * 20 + 5).toFixed(1)}%`, // Mock data
                             riskLevel: ["Low", "Medium", "High", "Very High"][Math.floor(Math.random() * 4)],
                             category: ["Technology", "Energy", "Real Estate", "Cryptocurrency", "Commodities"][Math.floor(Math.random() * 5)],
-                            image: `https://via.placeholder.com/300x200?text=${club.name.replace(/\s+/g, '+')}`
+                            image: `https://picsum.photos/300/200?random=${Math.floor(Math.random() * 1000)}`
                         }));
                         setClubs(transformedClubs);
                         setError(null);
@@ -53,7 +53,7 @@ const FeaturedClubs = () => {
                         monthlyReturn: "+12.5%",
                         riskLevel: "High",
                         category: "Technology",
-                        image: "https://via.placeholder.com/300x200?text=Tech+Club"
+                        image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=300&h=200&fit=crop&crop=center"
                     },
                     {
                         id: 2,
@@ -64,7 +64,7 @@ const FeaturedClubs = () => {
                         monthlyReturn: "+8.2%",
                         riskLevel: "Medium",
                         category: "Energy",
-                        image: "https://via.placeholder.com/300x200?text=Green+Energy"
+                        image: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=300&h=200&fit=crop&crop=center"
                     },
                     {
                         id: 3,
@@ -75,7 +75,7 @@ const FeaturedClubs = () => {
                         monthlyReturn: "+6.8%",
                         riskLevel: "Medium",
                         category: "Real Estate",
-                        image: "https://via.placeholder.com/300x200?text=Real+Estate"
+                        image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=300&h=200&fit=crop&crop=center"
                     },
                     {
                         id: 4,
@@ -86,7 +86,7 @@ const FeaturedClubs = () => {
                         monthlyReturn: "+24.1%",
                         riskLevel: "Very High",
                         category: "Cryptocurrency",
-                        image: "https://via.placeholder.com/300x200?text=Crypto"
+                        image: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=300&h=200&fit=crop&crop=center"
                     },
                     {
                         id: 5,
@@ -97,7 +97,7 @@ const FeaturedClubs = () => {
                         monthlyReturn: "+4.9%",
                         riskLevel: "Low",
                         category: "Technology",
-                        image: "https://via.placeholder.com/300x200?text=Dividends"
+                        image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=300&h=200&fit=crop&crop=center"
                     },
                     {
                         id: 6,
@@ -108,7 +108,7 @@ const FeaturedClubs = () => {
                         monthlyReturn: "+7.3%",
                         riskLevel: "Medium",
                         category: "Commodities",
-                        image: "https://via.placeholder.com/300x200?text=Commodities"
+                        image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=300&h=200&fit=crop&crop=center"
                     },
                     {
                         id: 7,
@@ -119,7 +119,7 @@ const FeaturedClubs = () => {
                         monthlyReturn: "+15.2%",
                         riskLevel: "High",
                         category: "Technology",
-                        image: "https://via.placeholder.com/300x200?text=AI+ML"
+                        image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=300&h=200&fit=crop&crop=center"
                     },
                     {
                         id: 8,
@@ -130,7 +130,7 @@ const FeaturedClubs = () => {
                         monthlyReturn: "+9.8%",
                         riskLevel: "Medium",
                         category: "Energy",
-                        image: "https://via.placeholder.com/300x200?text=Solar+Wind"
+                        image: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=300&h=200&fit=crop&crop=center"
                     },
                     {
                         id: 9,
@@ -141,7 +141,7 @@ const FeaturedClubs = () => {
                         monthlyReturn: "+7.1%",
                         riskLevel: "Medium",
                         category: "Real Estate",
-                        image: "https://via.placeholder.com/300x200?text=Commercial+RE"
+                        image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=300&h=200&fit=crop&crop=center"
                     },
                     {
                         id: 10,
@@ -152,7 +152,7 @@ const FeaturedClubs = () => {
                         monthlyReturn: "+28.5%",
                         riskLevel: "Very High",
                         category: "Cryptocurrency",
-                        image: "https://via.placeholder.com/300x200?text=DeFi+Web3"
+                        image: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=300&h=200&fit=crop&crop=center"
                     },
                     {
                         id: 11,
@@ -163,7 +163,7 @@ const FeaturedClubs = () => {
                         monthlyReturn: "+5.4%",
                         riskLevel: "Low",
                         category: "Commodities",
-                        image: "https://via.placeholder.com/300x200?text=Precious+Metals"
+                        image: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=300&h=200&fit=crop&crop=center"
                     },
                     {
                         id: 12,
@@ -174,7 +174,7 @@ const FeaturedClubs = () => {
                         monthlyReturn: "+11.2%",
                         riskLevel: "High",
                         category: "Energy",
-                        image: "https://via.placeholder.com/300x200?text=Oil+Gas"
+                        image: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=300&h=200&fit=crop&crop=center"
                     }
                 ];
                 setClubs(staticClubs);

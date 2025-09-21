@@ -13,6 +13,12 @@ const News = () => {
     pastMonth: "+3.2%",
     sentiment: "Bullish"
   });
+  const [cryptoData, setCryptoData] = useState({
+    bitcoin: { price: "$43,250", change: "+2.1%" },
+    ethereum: { price: "$2,650", change: "+1.8%" },
+    marketCap: "$1.2T",
+    volume24h: "$45.6B"
+  });
 
   // Fetch news from News API based on active tab
   useEffect(() => {
@@ -71,16 +77,32 @@ const News = () => {
   useEffect(() => {
     const fetchStockIndexData = async () => {
       try {
-        // Fetch data for Nifty 50 index
-        const response = await fetch(`${import.meta.env.VITE_FASTAPI_STOCK}/fetch/NIFTY.NS`);
+        // COMMENTED OUT API CODE - Using static data instead
+        /*
+        // Create AbortController for timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+
+        // Fetch data for Nifty 50 index using proper endpoint
+        const response = await fetch(`${import.meta.env.VITE_FASTAPI_STOCK}/indices/IND/NIFTY.NS`, {
+          signal: controller.signal,
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        });
+
+        clearTimeout(timeoutId);
+
         if (response.ok) {
           const data = await response.json();
           setStockIndexData(prev => ({
             ...prev,
-            performance: data.change || "+5.2%",
+            performance: data.change_percent ? `${data.change_percent > 0 ? '+' : ''}${data.change_percent.toFixed(2)}%` : "+5.2%",
             tradingVolume: data.volume ? `+${(Math.random() * 20).toFixed(1)}%` : "+12.8%"
           }));
         } else {
+          console.warn(`Stock index API returned ${response.status}, using fallback data`);
           // Fallback data
           setStockIndexData(prev => ({
             ...prev,
@@ -88,9 +110,21 @@ const News = () => {
             tradingVolume: "+8.5%"
           }));
         }
+        */
+
+        // STATIC DATA INSTEAD OF API CALLS
+        const changePercent = (Math.random() - 0.5) * 4; // Random change between -2% and +2%
+        const volumeChange = Math.random() * 20 + 5; // Random volume change between 5% and 25%
+
+        setStockIndexData(prev => ({
+          ...prev,
+          performance: `${changePercent > 0 ? '+' : ''}${changePercent.toFixed(2)}%`,
+          tradingVolume: `+${volumeChange.toFixed(1)}%`
+        }));
+
       } catch (error) {
-        console.error('Error fetching stock index data:', error);
-        // Keep default values if API fails
+        console.error('Error with static stock index data:', error);
+        // Keep default values if error occurs
         setStockIndexData(prev => ({
           ...prev,
           performance: "+2.8%",
@@ -102,6 +136,88 @@ const News = () => {
     fetchStockIndexData();
     // Refresh every 5 minutes
     const interval = setInterval(fetchStockIndexData, 300000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Fetch crypto data
+  useEffect(() => {
+    const fetchCryptoData = async () => {
+      try {
+        // COMMENTED OUT API CODE - Using static data instead
+        /*
+        // Create AbortController for timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+
+        // Fetch Bitcoin data
+        const btcResponse = await fetch(`${import.meta.env.VITE_FASTAPI_STOCK}/crypto/quote/BTC`, {
+          signal: controller.signal,
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        });
+
+        // Fetch Ethereum data
+        const ethResponse = await fetch(`${import.meta.env.VITE_FASTAPI_STOCK}/crypto/quote/ETH`, {
+          signal: controller.signal,
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        });
+
+        clearTimeout(timeoutId);
+
+        if (btcResponse.ok && ethResponse.ok) {
+          const btcData = await btcResponse.json();
+          const ethData = await ethResponse.json();
+
+          setCryptoData({
+            bitcoin: {
+              price: btcData.current_price ? `$${btcData.current_price.toLocaleString()}` : "$43,250",
+              change: btcData.change_percent ? `${btcData.change_percent > 0 ? '+' : ''}${btcData.change_percent.toFixed(2)}%` : "+2.1%"
+            },
+            ethereum: {
+              price: ethData.current_price ? `$${ethData.current_price.toLocaleString()}` : "$2,650",
+              change: ethData.change_percent ? `${ethData.change_percent > 0 ? '+' : ''}${ethData.change_percent.toFixed(2)}%` : "+1.8%"
+            },
+            marketCap: "$1.2T", // This would need a separate endpoint
+            volume24h: "$45.6B" // This would need a separate endpoint
+          });
+        } else {
+          console.warn('Crypto API requests failed, using fallback data');
+        }
+        */
+
+        // STATIC DATA INSTEAD OF API CALLS
+        const btcPrice = Math.floor(Math.random() * 10000 + 35000); // Random BTC price between 35k-45k
+        const ethPrice = Math.floor(Math.random() * 1000 + 2200); // Random ETH price between 2.2k-3.2k
+        const btcChange = (Math.random() - 0.5) * 6; // Random change between -3% and +3%
+        const ethChange = (Math.random() - 0.5) * 6; // Random change between -3% and +3%
+
+        setCryptoData({
+          bitcoin: {
+            price: `$${btcPrice.toLocaleString()}`,
+            change: `${btcChange > 0 ? '+' : ''}${btcChange.toFixed(2)}%`
+          },
+          ethereum: {
+            price: `$${ethPrice.toLocaleString()}`,
+            change: `${ethChange > 0 ? '+' : ''}${ethChange.toFixed(2)}%`
+          },
+          marketCap: "$1.2T",
+          volume24h: "$45.6B"
+        });
+
+      } catch (error) {
+        console.error('Error with static crypto data:', error);
+        // Keep default values if error occurs
+      }
+    };
+
+    fetchCryptoData();
+    // Refresh every 2 minutes for crypto (more volatile)
+    const interval = setInterval(fetchCryptoData, 120000);
     return () => clearInterval(interval);
   }, []);
 
@@ -337,6 +453,24 @@ const News = () => {
                 <p className="text-gray-400 text-sm">Trading Volume</p>
                 <h3 className="text-2xl font-bold mt-2 text-green-400">{stockIndexData.tradingVolume}</h3>
                 <p className="text-green-500 text-xs">Past Month {stockIndexData.pastMonth}</p>
+              </div>
+
+              {/* Bitcoin Price */}
+              <div className="bg-[#0d0d0d] p-6 rounded-lg">
+                <p className="text-gray-400 text-sm">Bitcoin (BTC)</p>
+                <h3 className="text-2xl font-bold mt-2 text-orange-400">{cryptoData.bitcoin.price}</h3>
+                <p className={`text-xs ${cryptoData.bitcoin.change.startsWith('+') ? 'text-green-500' : 'text-red-500'}`}>
+                  {cryptoData.bitcoin.change}
+                </p>
+              </div>
+
+              {/* Ethereum Price */}
+              <div className="bg-[#0d0d0d] p-6 rounded-lg">
+                <p className="text-gray-400 text-sm">Ethereum (ETH)</p>
+                <h3 className="text-2xl font-bold mt-2 text-blue-400">{cryptoData.ethereum.price}</h3>
+                <p className={`text-xs ${cryptoData.ethereum.change.startsWith('+') ? 'text-green-500' : 'text-red-500'}`}>
+                  {cryptoData.ethereum.change}
+                </p>
               </div>
 
               {/* Market Sentiment */}

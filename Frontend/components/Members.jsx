@@ -31,7 +31,7 @@ const Members = () => {
       }
 
       // Fetch members for the specific club
-      const membersResponse = await fetch(`http://localhost:3000/api/clubs/${clubId}/members`, {
+      const membersResponse = await fetch(`${import.meta.env.VITE_APP_API_BASE}/clubs/${clubId}/members`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -84,7 +84,7 @@ const Members = () => {
 
   useEffect(() => {
     fetchMembers();
-  }, [clubId]);
+  }, [clubId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="flex min-h-screen bg-[#131712] text-white">

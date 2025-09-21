@@ -15,7 +15,6 @@ const ProposalsVoting = () => {
   const { clubId } = useParams();
   const [proposals, setProposals] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [selectedProposal, setSelectedProposal] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
@@ -36,13 +35,13 @@ const ProposalsVoting = () => {
       const token = localStorage.getItem('token');
 
       if (!token) {
-        setError('Please log in to view proposals');
+        console.error('Please log in to view proposals');
         setLoading(false);
         return;
       }
 
       if (!clubId) {
-        setError('No club selected');
+        console.error('No club selected');
         setLoading(false);
         return;
       }
@@ -56,7 +55,7 @@ const ProposalsVoting = () => {
 
       if (!response.ok) {
         if (response.status === 401) {
-          setError('Session expired. Please log in again.');
+          console.error('Session expired. Please log in again.');
           localStorage.removeItem('token');
           return;
         }
@@ -65,10 +64,9 @@ const ProposalsVoting = () => {
 
       const proposalsData = await response.json();
       setProposals(proposalsData);
-      setError(null);
     } catch (err) {
       console.error('Error fetching proposals:', err);
-      setError('Failed to load proposals. Please try again later.');
+      console.error('Failed to load proposals. Please try again later.');
     } finally {
       setLoading(false);
     }
@@ -112,7 +110,7 @@ const ProposalsVoting = () => {
       fetchProposals();
     } catch (error) {
       console.error('Error creating proposal:', error);
-      setError('Failed to create proposal. Please try again.');
+      console.error('Failed to create proposal. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -143,7 +141,7 @@ const ProposalsVoting = () => {
       fetchProposals();
     } catch (error) {
       console.error('Error casting vote:', error);
-      setError('Failed to cast vote. Please try again.');
+      console.error('Failed to cast vote. Please try again.');
     } finally {
       setVoting(false);
     }
@@ -160,7 +158,7 @@ const ProposalsVoting = () => {
 
   useEffect(() => {
     fetchProposals();
-  }, [clubId]);
+  }, [clubId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Vote Distribution for selected proposal
   const getVoteData = (proposal) => {

@@ -23,13 +23,12 @@ A full-stack platform for managing investment clubs, including club creation, me
 
 ```
 invest-club-platform/
-├── Backend/
+├── server/
 │   ├── models/           # Mongoose models for all entities
 │   ├── routes/           # Express route handlers
 │   ├── middleware/       # Auth and other middleware
 │   ├── utils/            # Utility functions (e.g., email)
 │   ├── docs/             # API documentation
-│   ├── uploads/          # File uploads
 │   ├── index.js          # Main server entry point
 │   └── package.json      # Backend dependencies
 ├── Frontend/
@@ -53,13 +52,23 @@ invest-club-platform/
 ### Backend Setup
 1. Navigate to the backend folder:
 	```powershell
-	cd Backend
+	cd server
 	```
-2. Install dependencies:
+2. Create a `.env` file with the following variables:
+	```
+	MONGODB_URI=mongodb://localhost:27017/investclub
+	PORT=3000
+	JWT_SECRET=your-secret-key
+	EMAIL_HOST=smtp.gmail.com
+	EMAIL_PORT=587
+	EMAIL_USER=your-email@gmail.com
+	EMAIL_PASS=your-app-password
+	```
+3. Install dependencies:
 	```powershell
 	npm install
 	```
-3. Start the backend server:
+4. Start the backend server:
 	```powershell
 	npm start
 	```
@@ -79,7 +88,7 @@ invest-club-platform/
 	```
 
 ## API Documentation
-See `Backend/API_DOCUMENTATION.md` and `Backend/docs/api-endpoints.md` for details on available endpoints and usage.
+See `server/API_DOCUMENTATION.md` and `server/docs/api-endpoints.md` for details on available endpoints and usage.
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.

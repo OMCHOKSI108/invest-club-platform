@@ -11,7 +11,7 @@ const Signup = () => {
     password: "",
   });
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(null);
   const [otp, setOtp] = useState("");
   const [showOtp, setShowOtp] = useState(false);
   const navigate = useNavigate();
@@ -22,24 +22,28 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Signup form submitted with data:', form);
     setLoading(true);
-    setMessage("");
+    setMessage(null);
 
     try {
-      const res = await fetch("http://localhost:3000/api/auth/signup", {
+      const res = await fetch(`${import.meta.env.VITE_APP_API_BASE}/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
 
       if (res.ok) {
-        setMessage("A verification link has been sent to your email. Please check your inbox and click the link to verify your account.");
+        console.log('Signup successful, response:', await res.json());
+        setMessage({ type: 'success', text: "A verification link has been sent to your email. Please check your inbox and click the link to verify your account." });
         setShowOtp(true);
       } else {
         const data = await res.json().catch(() => ({}));
-        setMessage(data?.message || "Registration failed. Try again.");
+        console.log('Signup failed, response:', data);
+        setMessage({ type: 'error', text: data?.message || "Registration failed. Try again." });
       }
     } catch (err) {
+      console.error('Signup error:', err);
       setMessage("Server error. Please try again later.");
     } finally {
       setLoading(false);
@@ -54,7 +58,7 @@ const Signup = () => {
 
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:3000/api/auth/verify-signup', {
+      const response = await fetch(`${import.meta.env.VITE_APP_API_BASE}/auth/verify-signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -79,6 +83,7 @@ const Signup = () => {
         setMessage({ type: 'error', text: data.message || 'OTP verification failed' });
       }
     } catch (error) {
+      console.error('OTP verification error:', error);
       setMessage({ type: 'error', text: 'Network error. Please try again.' });
     } finally {
       setLoading(false);

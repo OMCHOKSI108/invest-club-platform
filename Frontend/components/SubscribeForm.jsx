@@ -17,10 +17,10 @@ export default function SubscribeForm({ clubId: propClubId, fetchSubscriptions, 
   const [subscriptions, setSubscriptions] = useState([]);
   const [loadingSubs, setLoadingSubs] = useState(false);
 
-const API_BASE =
-  import.meta.env.VITE_API_BASE ||
-  import.meta.env.VITE_APP_API_BASE ||
-  "http://localhost:3000/api";
+  const API_BASE =
+    import.meta.env.VITE_API_BASE ||
+    import.meta.env.VITE_APP_API_BASE ||
+    "http://localhost:3000/api";
 
   useEffect(() => {
     setClubId(propClubId || "");
@@ -35,7 +35,7 @@ const API_BASE =
       try {
         const list = await fetchSubscriptions(clubId);
         if (mounted) setSubscriptions(Array.isArray(list) ? list : []);
-      } catch (err) {
+      } catch {
         // ignore
       } finally {
         if (mounted) setLoadingSubs(false);
@@ -146,9 +146,8 @@ const API_BASE =
             <button
               type="submit"
               disabled={loading}
-              className={`flex-1 inline-flex items-center justify-center gap-2 py-2 rounded-full text-black font-semibold transition shadow-md ${
-                loading ? "bg-green-400/70 cursor-not-allowed" : "bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600"
-              }`}
+              className={`flex-1 inline-flex items-center justify-center gap-2 py-2 rounded-full text-black font-semibold transition shadow-md ${loading ? "bg-green-400/70 cursor-not-allowed" : "bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600"
+                }`}
             >
               {loading ? "Subscribing..." : "Subscribe"}
             </button>

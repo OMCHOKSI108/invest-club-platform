@@ -24,7 +24,7 @@ const sampleClubs = [
         votingMode: "weighted",
         approvalThresholdPercent: 60,
         isPublic: true,
-        investmentSymbols: ["AAPL", "GOOGL", "MSFT", "TSLA", "NVDA"]
+        investmentSymbols: ["AAPL", "GOOGL", "MSFT", "TSLA", "NVDA", "RELIANCE.NS", "TCS.NS", "INFY.NS"]
     },
     {
         name: "AI & Machine Learning Fund",
@@ -40,7 +40,7 @@ const sampleClubs = [
         votingMode: "simple",
         approvalThresholdPercent: 50,
         isPublic: true,
-        investmentSymbols: ["GOOGL", "META", "AMZN", "NFLX", "CRM"]
+        investmentSymbols: ["GOOGL", "META", "AMZN", "NFLX", "CRM", "TCS.NS", "INFY.NS", "WIPRO.NS"]
     },
     {
         name: "Blockchain Pioneers",
@@ -142,7 +142,7 @@ const sampleClubs = [
         votingMode: "simple",
         approvalThresholdPercent: 50,
         isPublic: true,
-        investmentSymbols: ["BTC", "ETH", "ADA", "SOL", "DOT"]
+        investmentSymbols: ["BTC", "ETH", "BNB", "ADA", "SOL", "DOT", "DOGE", "AVAX"]
     },
     {
         name: "DeFi Protocols Club",
@@ -158,10 +158,25 @@ const sampleClubs = [
         votingMode: "weighted",
         approvalThresholdPercent: 60,
         isPublic: true,
-        investmentSymbols: ["UNI", "AAVE", "COMP", "MKR", "SUSHI"]
+        investmentSymbols: ["UNI", "AAVE", "COMP", "MKR", "SUSHI", "LINK", "CRV", "YFI"]
     },
 
-    // Commodities Clubs
+    {
+        name: "Indian Market Leaders",
+        description: "Investing in top Indian companies across sectors",
+        category: "Technology",
+        riskLevel: "Medium",
+        members: 334,
+        totalValue: "$3.8M",
+        monthlyReturn: "+10.8%",
+        image: "https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=400&h=300&fit=crop",
+        minContribution: 1500,
+        currency: "INR",
+        votingMode: "weighted",
+        approvalThresholdPercent: 60,
+        isPublic: true,
+        investmentSymbols: ["RELIANCE.NS", "TCS.NS", "INFY.NS", "HDFCBANK.NS", "ICICIBANK.NS", "BHARTIARTL.NS", "ITC.NS", "LT.NS"]
+    },
     {
         name: "Precious Metals Fund",
         description: "Gold, silver, and precious metals investment portfolio",
@@ -205,9 +220,10 @@ async function seedDatabase() {
         });
         console.log('Connected to MongoDB');
 
-        // Clear existing clubs
+        // Clear existing clubs and users
         await Club.deleteMany({});
-        console.log('Cleared existing clubs');
+        await User.deleteMany({ email: { $ne: 'admin@investclub.com' } }); // Keep admin user
+        console.log('Cleared existing clubs and users');
 
         // Create a dummy user for club ownership (you might want to create a proper admin user)
         let dummyUser = await User.findOne({ email: 'admin@investclub.com' });
@@ -226,14 +242,14 @@ async function seedDatabase() {
 
         // Create some sample users with Indian names
         const sampleUsers = [
-            { firstName: 'Rahul', lastName: 'Sharma', username: 'rahulsharma', email: 'rahul@example.com' },
-            { firstName: 'Priya', lastName: 'Patel', username: 'priyapatel', email: 'priya@example.com' },
-            { firstName: 'Amit', lastName: 'Kumar', username: 'amitkumar', email: 'amit@example.com' },
-            { firstName: 'Sneha', lastName: 'Singh', username: 'snehasingh', email: 'sneha@example.com' },
-            { firstName: 'Vikram', lastName: 'Gupta', username: 'vikramgupta', email: 'vikram@example.com' },
-            { firstName: 'Anjali', lastName: 'Verma', username: 'anjaliverma', email: 'anjali@example.com' },
-            { firstName: 'Rajesh', lastName: 'Yadav', username: 'rajeshkumar', email: 'rajesh@example.com' },
-            { firstName: 'Kavita', lastName: 'Jain', username: 'kavitajain', email: 'kavita@example.com' }
+            { firstName: 'Rahul', lastName: 'Sharma', username: 'rahulsharma', email: 'rahulsharma@gmail.com' },
+            { firstName: 'Priya', lastName: 'Patel', username: 'priyapatel', email: 'priyapatel@gmail.com' },
+            { firstName: 'Amit', lastName: 'Kumar', username: 'amitkumar', email: 'amitkumar@gmail.com' },
+            { firstName: 'Sneha', lastName: 'Singh', username: 'snehasingh', email: 'snehasingh@gmail.com' },
+            { firstName: 'Vikram', lastName: 'Gupta', username: 'vikramgupta', email: 'vikramgupta@gmail.com' },
+            { firstName: 'Anjali', lastName: 'Verma', username: 'anjaliverma', email: 'anjaliverma@gmail.com' },
+            { firstName: 'Rajesh', lastName: 'Yadav', username: 'rajeshkumar', email: 'rajeshkumar@gmail.com' },
+            { firstName: 'Kavita', lastName: 'Jain', username: 'kavitajain', email: 'kavitajain@gmail.com' }
         ];
 
         const createdUsers = [];

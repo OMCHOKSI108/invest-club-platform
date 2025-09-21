@@ -124,6 +124,9 @@ const Dashboard = () => {
 
       try {
         const symbols = dashboardData.club.investmentSymbols.slice(0, 5);
+
+        // COMMENTED OUT API CODE - Using static data instead
+        /*
         const pricePromises = symbols.map(async (symbol) => {
           try {
             const response = await fetch(`/api/stock/fetch/${symbol}`);
@@ -144,9 +147,26 @@ const Dashboard = () => {
         });
 
         const prices = (await Promise.all(pricePromises)).filter((p) => p !== null);
+        */
+
+        // STATIC DATA INSTEAD OF API CALLS
+        const prices = symbols.map((symbol) => {
+          const basePrice = Math.random() * 1000 + 100; // Random base price between 100-1100
+          const changePercent = (Math.random() - 0.5) * 10; // Random change between -5% and +5%
+          const marketCap = Math.floor(Math.random() * 1000000000 + 100000000); // Random market cap
+
+          return {
+            symbol,
+            name: symbol,
+            price: Math.round(basePrice * 100) / 100,
+            change: `${changePercent > 0 ? '+' : ''}${changePercent.toFixed(2)}%`,
+            marketCap: `$${(marketCap / 1000000000).toFixed(2)}B`,
+          };
+        });
+
         setLivePrices(prices);
       } catch (err) {
-        console.error("Error fetching live prices:", err);
+        console.error("Error with static live prices:", err);
         setLivePrices([]);
       } finally {
         setPricesLoading(false);
@@ -193,9 +213,8 @@ const Dashboard = () => {
           <nav className="space-y-4 text-gray-300">
             <Link
               to="/dashboard"
-              className={`block hover:text-green-500 ${
-                location.pathname === "/dashboard" ? "text-green-500" : ""
-              }`}
+              className={`block hover:text-green-500 ${location.pathname === "/dashboard" ? "text-green-500" : ""
+                }`}
             >
               Dashboard
             </Link>
@@ -205,9 +224,8 @@ const Dashboard = () => {
                   ? `/club/${dashboardData.club._id}/members`
                   : "/members"
               }
-              className={`block hover:text-green-500 ${
-                location.pathname.includes("/members") ? "text-green-500" : ""
-              }`}
+              className={`block hover:text-green-500 ${location.pathname.includes("/members") ? "text-green-500" : ""
+                }`}
             >
               Members
             </Link>
@@ -217,9 +235,8 @@ const Dashboard = () => {
                   ? `/club/${dashboardData.club._id}/portfolio`
                   : "/portfolio"
               }
-              className={`block hover:text-green-500 ${
-                location.pathname.includes("/portfolio") ? "text-green-500" : ""
-              }`}
+              className={`block hover:text-green-500 ${location.pathname.includes("/portfolio") ? "text-green-500" : ""
+                }`}
             >
               Portfolio
             </Link>
@@ -229,9 +246,8 @@ const Dashboard = () => {
                   ? `/club/${dashboardData.club._id}/proposals`
                   : "/proposals"
               }
-              className={`block hover:text-green-500 ${
-                location.pathname.includes("/proposals") ? "text-green-500" : ""
-              }`}
+              className={`block hover:text-green-500 ${location.pathname.includes("/proposals") ? "text-green-500" : ""
+                }`}
             >
               Proposals
             </Link>

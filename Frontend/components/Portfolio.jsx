@@ -34,7 +34,9 @@ export default function ProposalsVoting(props) {
     if (paramClubId) {
       try {
         localStorage.setItem("currentClubId", paramClubId);
-      } catch {}
+      } catch {
+        // Ignore localStorage errors
+      }
     }
   }, [paramClubId]);
 
